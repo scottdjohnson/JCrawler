@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<project name="jsoup" default="build">
+    <target name="build">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" classpath="lib/jsoup-1.7.2.jar" includeantruntime="false"/>
+    </target>
+
+	<target name="clean">
+		<exec executable="rm">
+			<arg value="-R" />
+			<arg value="build" />
+		</exec>
+	</target>
+</project>
