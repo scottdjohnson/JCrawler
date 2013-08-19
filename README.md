@@ -28,7 +28,7 @@ grant SELECT, INSERT, UPDATE, DELETE, INDEX, ALTER, CREATE, LOCK TABLES, CREATE 
 
 flush privileges;
 
-create jcrawler;
+create database jcrawler;
 
 use jcrawler;
 
@@ -43,3 +43,5 @@ create table url_list (
 	primary key (url_key)
 
 );
+
+
