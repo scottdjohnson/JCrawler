@@ -22,7 +22,9 @@ public class JCrawlerApp
 		Validate.isTrue(args.length == 1, "usage: supply url to fetch");
 		String url 	= args[0];
 		
-		getLinksFromURL(new BinaryTree(), url, 0);
+		un.save();
+		
+		getLinksFromURL(new BinaryTree(), url, un.getKey());
 	}
 	
 	private static void getLinksFromURL( BinaryTree bt, String url, long parent)
