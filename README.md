@@ -33,9 +33,13 @@ create jcrawler;
 use jcrawler;
 
 create table url_list (
+
 	url_key int not null auto_increment, 
+
 	url text,
+
 	parent_key int,
+
 	primary key (url_key)
 
 );
