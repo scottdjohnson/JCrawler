@@ -15,7 +15,7 @@ To execute the application:
 
 java -jar jcrawler.jar http://myurl.com
 
-Relative URLs will be checked for URLs contained on the given page, absolute URLs are assumed (for now) to be external to the site. Therefore, this will roughly crawl all of the pages publicly available from the front page, assuming they can be accessed via the chain of hyperlinks. The links are stored in a dataase, with the referring link listed as a parent.
+Relative URLs will be checked for URLs contained on the given page, absolute URLs are assumed (for now) to be external to the site. Therefore, this will roughly crawl all of the pages publicly available from the front page, assuming they can be accessed via the chain of hyperlinks. The links are stored in a database, with the referring link listed as a parent.
 
 Database setup
 ========
