@@ -13,21 +13,19 @@ import java.io.IOException;
 import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
 
-/**
- * Example program to list links from a URL.
- */
 public class JCrawlerApp 
 {	
 	public static void main(String[] args)
 	{
+		URLNode un = new URLNode(args[0]);
+		 
 		Validate.isTrue(args.length == 1, "usage: supply url to fetch");
 		String url 	= args[0];
 		
-		getLinksFromURL(new BinaryTree(), url);
-
+		getLinksFromURL(new BinaryTree(), url, 0);
 	}
 	
-	private static void getLinksFromURL( BinaryTree bt, String url)
+	private static void getLinksFromURL( BinaryTree bt, String url, long parent)
 	{		
 		try{
 			Document doc = Jsoup.connect(url).get();
@@ -39,22 +37,26 @@ public class JCrawlerApp
 				
 				// We are going to assume that an absolute URL points to an external
 				//	external web site. Not an entirely safe assumption but ok for this demo
+								
 				if (u.isAbsolute())
 				{
-					bt.insertNode( new URLNode( link.attr("href") ) );
+					URLNode un = new URLNode( link.attr("href"), parent);
+					bt.insertNode( un );
 					System.out.println("Inserting absolute URL: " + link.attr("href"));
+					un.save();
 				}
 				else
 				{
-					URLNode un = new URLNode( link.attr("abs:href") );
+					URLNode un = new URLNode( link.attr("abs:href"), parent);
 
 					// We do a bit of extra work by checking and inserting, but this is a simple way
 					//	of assuring that we do not keeping looking at the same URL's in an infinite loop
 					if ( !bt.isNodeInTree( un ) )
 					{
 						bt.insertNode( un );
-						System.out.println("Inserting relative URL: " + un.getURL());
-						getLinksFromURL( bt, un.getURL() );
+						System.out.println("Inserting relative URL: " + un.getUrl());
+						un.save();
+						getLinksFromURL( bt, un.getUrl(), un.getKey() );
 					}					
 				}
 			}
