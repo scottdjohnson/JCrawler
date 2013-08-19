@@ -17,14 +17,16 @@ public class JCrawlerApp
 {	
 	public static void main(String[] args)
 	{
+		BinaryTree bt = new BinaryTree();
 		URLNode un = new URLNode(args[0]);
 		 
 		Validate.isTrue(args.length == 1, "usage: supply url to fetch");
 		String url 	= args[0];
 		
+		bt.insertNode(un);
 		un.save();
 		
-		getLinksFromURL(new BinaryTree(), url, un.getKey());
+		getLinksFromURL(bt, url, un.getKey());
 	}
 	
 	private static void getLinksFromURL( BinaryTree bt, String url, long parent)
@@ -43,9 +45,13 @@ public class JCrawlerApp
 				if (u.isAbsolute())
 				{
 					URLNode un = new URLNode( link.attr("href"), parent);
-					bt.insertNode( un );
-					System.out.println("Inserting absolute URL: " + link.attr("href"));
-					un.save();
+					
+					if ( !bt.isNodeInTree( un ) )
+					{
+						bt.insertNode( un );
+						un.save();
+						System.out.println("Inserting absolute URL: " + link.attr("href"));
+					}
 				}
 				else
 				{
