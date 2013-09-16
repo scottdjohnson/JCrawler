@@ -34,39 +34,37 @@ public class JCrawlerApp
 		try{
 			Document doc = Jsoup.connect(url).get();
 			Elements links = doc.select("a[href]");
+			int size		= links.size();
 		
-			for (Element link : links)
+			// First we store all the URLs at the current level
+			for (int i = 0; i < size; i++)
 			{
-				URI u		= new URI(link.attr("href"));
+				Element link = links.get(i);
 				
 				// We are going to assume that an absolute URL points to an external
 				//	external web site. Not an entirely safe assumption but ok for this demo
-								
-				if (u.isAbsolute())
+				
+				URLNode un = new URLNode( link.attr("abs:href"), parent);
+				
+				if ( !bt.isNodeInTree( un ) )
 				{
-					URLNode un = new URLNode( link.attr("href"), parent);
-					
-					if ( !bt.isNodeInTree( un ) )
-					{
-						bt.insertNode( un );
-						un.save();
-						System.out.println("Inserting absolute URL: " + link.attr("href"));
-					}
+					bt.insertNode( un );
+					un.save();
+					System.out.println("Inserting URL: " + link.attr("href"));
 				}
-				else
-				{
-					URLNode un = new URLNode( link.attr("abs:href"), parent);
+			}				
+			
+			// We now go through the links again and look recursively, except for links we have already looked at
+			for (int i = 0; i < size; i++)
+			{
+				Element link 	= links.get(i);
+				URLNode un 	= new URLNode( link.attr("abs:href"), parent);
+				URI u           = new URI(link.attr("href"));
 
-					// We do a bit of extra work by checking and inserting, but this is a simple way
-					//	of assuring that we do not keeping looking at the same URL's in an infinite loop
-					if ( !bt.isNodeInTree( un ) )
-					{
-						bt.insertNode( un );
-						System.out.println("Inserting relative URL: " + un.getUrl());
-						un.save();
+				if ( !bt.isNodeInTree( un ) )
+					if (!u.isAbsolute())
 						getLinksFromURL( bt, un.getUrl(), un.getKey() );
-					}					
-				}
+
 			}
 		}
 		catch(URISyntaxException e)
