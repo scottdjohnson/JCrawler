@@ -4,6 +4,11 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import java.util.List;
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import org.jsoup.Jsoup;
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Document;
@@ -23,15 +28,27 @@ public class JCrawlerServlet extends HttpServlet
   	public void doGet(HttpServletRequest request,HttpServletResponse response)
     	 throws ServletException, IOException 
 	{
+		String urlkey = request.getParameter("urlkey");
+
+		org.hibernate.Session s = new Configuration().configure().buildSessionFactory().openSession();
+                Query query;
+
+		// If there is a specifc key, get it, otherwise get all of them
+		if (null != urlkey)
+			query = s.createQuery("from URLNode url_list where parent_key = " + urlkey);
+		else
+			query = s.createQuery("from URLNode url_list where parent_key = 0");
+
 		response.setContentType("text/html");
     		PrintWriter out = response.getWriter();
-    		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 " +
-                                        "Transitional//EN\">\n" +
-                	"<HTML>\n" +
-                	"<HEAD><TITLE>JCrawler Servlet</TITLE></HEAD>\n" +
-                	"<BODY>\n" +
-                	"<H1>JCrawler Servlet test</H1>\n" +
-                	"</BODY></HTML>");
+
+                List list =  query.list();
+                s.close();
+
+		for (int i = 0; i < list.size(); i++)
+			out.println("<a href='?urlkey=" + ((URLNode)list.get(i)).getKey() + "'>" 
+			+ ((URLNode)list.get(i)).getUrl() + "</a><br />");
+
 	}
 
         public void doPost(HttpServletRequest request, HttpServletResponse response)
