@@ -40,6 +40,8 @@ public class JCrawlerServlet extends HttpServlet
 			query = s.createQuery("from URLNode url_list where parent_key = 0");
 
 		response.setContentType("text/html");
+		response.setHeader("Access-Control-Allow-Origin","*");
+
     		PrintWriter out = response.getWriter();
 
                 List list =  query.list();
