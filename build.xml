@@ -2,12 +2,14 @@
 <project name="jsoup" default="create_run_jar">
 	<property name="sourcedir" value="src"/>
 	<property name="builddir" value="build/classes"/>
+	<property environment="env"/>
 	<path id="JCrawlerApp.classpath">
-        <pathelement location="./lib/hibernate3.jar"/>
-        <pathelement location="./lib/jsoup-1.7.2.jar"/>
-        <pathelement location="./lib/mail.jar"/>
-        <pathelement location="./lib/commons-lang3-3.0.1.jar"/>
-    </path>
+        	<pathelement location="./lib/hibernate3.jar"/>
+        	<pathelement location="./lib/jsoup-1.7.2.jar"/>
+        	<pathelement location="./lib/mail.jar"/>
+        	<pathelement location="./lib/commons-lang3-3.0.1.jar"/>
+		<pathelement location="${env.CATALINA_HOME}/lib/servlet-api.jar" />
+  	</path>
     <target name="build">
         <mkdir dir="${builddir}"/>
 		<copy includeemptydirs="false" todir="${builddir}">
