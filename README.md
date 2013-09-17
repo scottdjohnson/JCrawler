@@ -44,4 +44,14 @@ create table url_list (
 
 );
 
+Servlet
+========
+
+To run this as a servlet:
+
+	Compile with ant, then place everything in build/classes into the classes directy in WEB-INF
+
+	Copy all the jar files in lib to the Tomcat lib directory (eg $CATALINA_HOME/lib)
+
+	Update web.xml to point the JCrawler, and scottdjohnson.jcrawler.JCrawlerServlet
 
