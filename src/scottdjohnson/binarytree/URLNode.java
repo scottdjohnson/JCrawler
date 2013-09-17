@@ -11,6 +11,13 @@ public class URLNode extends Node
 	private long key;
 	private long parentKey;
 
+	public URLNode ()
+	{
+		super();
+		setUrl("");
+		parentKey = 0;
+	}
+
 	public URLNode( String s )
 	{
 		super();
