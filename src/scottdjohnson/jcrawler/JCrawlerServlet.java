@@ -30,7 +30,7 @@ public class JCrawlerServlet extends HttpServlet
 	{
 		String urlkey = request.getParameter("urlkey");
 
-		org.hibernate.Session s = new Configuration().configure().buildSessionFactory().openSession();
+		org.hibernate.Session s = getSession();
                 Query query;
 
 		// If there is a specifc key, get it, otherwise get all of them
@@ -48,14 +48,21 @@ public class JCrawlerServlet extends HttpServlet
                 s.close();
 
 		for (int i = 0; i < list.size(); i++)
-			out.println("<a href='?urlkey=" + ((URLNode)list.get(i)).getKey() + "'>" 
-			+ ((URLNode)list.get(i)).getUrl() + "</a><br />");
+		{
+                        int count =( (Integer) getSession().createQuery("select count(*) from URLNode where parent_key="
+				+ ((URLNode)list.get(i)).getKey()).iterate().next() ).intValue();
 
+			out.println("<a href='' onclick=\"return getAJAX(" + ((URLNode)list.get(i)).getKey() + ");\">" 
+                        + ((URLNode)list.get(i)).getUrl() + "</a> (" + count + ")<br />");
+		}
 	}
 
         public void doPost(HttpServletRequest request, HttpServletResponse response)
          throws ServletException, IOException
 	{
+                response.setContentType("text/html");
+                response.setHeader("Access-Control-Allow-Origin","*");
+
 		String crawl_url = request.getParameter("crawl_url");
 
 		BinaryTree bt = new BinaryTree();
@@ -65,8 +72,11 @@ public class JCrawlerServlet extends HttpServlet
 		un.save();
 		
 		JCrawler.getLinksFromURL(bt, crawl_url, un.getKey());
+	}
 
-		response.sendRedirect(request.getHeader("referer"));
+	private org.hibernate.Session getSession()
+	{
+		return new Configuration().configure().buildSessionFactory().openSession();
 	}
 }
 
