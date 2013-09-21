@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function postAJAX()
+{
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+ 	{
+		xmlhttp=new XMLHttpRequest();
+	}
+	else
+	{
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	
+	xmlhttp.open("POST","http://scrawlbot.com:8080/JCrawlerServlet",false);
+	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	xmlhttp.send("crawl_url=http://www.kcptech.com");
+
+}
+
+function getAJAX( getKey)
+{
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+        {
+                xmlhttp = new XMLHttpRequest();
+        }
+        else
+        {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        
+        xmlhttp.onreadystatechange = function()
+        {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                        document.getElementById("urls").innerHTML=xmlhttp.responseText;
+                }
+        }
+
+        xmlhttp.open("GET","http://scrawlbot.com:8080/JCrawlerServlet?urlkey=" + getKey,true);
+        xmlhttp.send();
+
+	return false;
+}
+
+</script>
+<title>SCrawlBot</title>
+</head>
+<body onload="getAJAX(0);">
+<a href="/">HOME</a><p/>
+<b>Crawl a URL</b><br />
+<input type="text" id="urlkey" value="http://" />
+<button type="button" onclick="postAJAX();getAJAX(0);">Submit</button>
+<br />
+<hr />
+<b>Database-stored URL crawls</b> (click to see links found under the given URL) <p />
+<div id="urls">
+</div>
+<p />
+<b>About</b> <br />
+
+This tool is a simple example of a Java-based web crawler. Enter a complete url (beginning with "http://") and that page will be crawled, its links will be stored in the database and any links it finds which are also in that domain will be crawled as well, recursively. It is a prototype and therefore has a number of limitations. For example, it assumes that an absolute URL found on a web page is external to that domain and therefore does not crawl it. However, it is a proof of concept that such a tool can be created using Java Hibernate, JSoup and AJAX.
+<p />
+<a href="https://github.com/scottdjohnson/JCrawler">Source code on gituhb</a>
+
+</body>
+</html>
