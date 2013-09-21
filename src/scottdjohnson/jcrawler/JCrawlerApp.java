@@ -14,8 +14,15 @@ import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
 import scottdjohnson.jcrawler.JCrawler;
 
+/**
+ * Provides the main function for accessing JCrawler
+ */
 public class JCrawlerApp 
 {	
+	/**
+	 * Main function for launching JCrawler
+	 * @param args a URL to crawl and store in the database
+	 */
 	public static void main(String[] args)
 	{
 		BinaryTree bt = new BinaryTree();
