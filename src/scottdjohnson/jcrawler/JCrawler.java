@@ -13,8 +13,24 @@ import java.io.IOException;
 import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
 
+/**
+ * JCrawler provides the basic functionlity for crawling a Web URL.
+ * 
+ * @author Scott Johnson
+ */
 public class JCrawler 
 {	
+	/**
+	 * Crawl a URL and store it and its children in a database
+	 * Absolute URLs are assumed to be external to the site, relative
+	 * URLs are considered internal and are also crawled recursively
+	 * The binary tree bt assures that we do not crawl a URL more than once
+	 * otherwise we will likely end up in an ifinite loop
+	 * 
+	 * @param bt A binary tree which stores the URLs that we have crawled so far
+	 * @param url The URL to crawl
+	 * @param parent The parent key in the database for this URL
+	 */
 	public static void getLinksFromURL( BinaryTree bt, String url, long parent)
 	{		
 		try{
