@@ -16,7 +16,11 @@ import scottdjohnson.jcrawler.JCrawler;
 
 /**
  * Provides the main function for accessing JCrawler
- */
+ *
+ * @see JCrawler
+ *
+ * @author Scott Johnson
+ **/
 public class JCrawlerApp 
 {	
 	/**

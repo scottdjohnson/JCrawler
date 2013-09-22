@@ -17,7 +17,7 @@ import scottdjohnson.binarytree.BinaryTree;
  * JCrawler provides the basic functionlity for crawling a Web URL.
  * 
  * @author Scott Johnson
- */
+ **/
 public class JCrawler 
 {	
 	/**

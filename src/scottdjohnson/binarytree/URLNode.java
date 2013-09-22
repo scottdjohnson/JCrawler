@@ -8,6 +8,8 @@ import scottdjohnson.binarytree.Node;
 /**
  * An implementation of the abstract Node class, where the data in a Node is a URL
  * Additionally, this Node type is saveable via Hibernate
+ *
+ * @author Scott Johnson
  **/
 public class URLNode extends Node
 {

@@ -25,7 +25,11 @@ import scottdjohnson.jcrawler.JCrawler;
 
 /**
  * A servlet class for posting new URLs to crawl and getting URL crawl results form the database
- */
+ *
+ * @see JCrawler
+ *
+ * @author Scott Johnson
+ **/
 public class JCrawlerServlet extends HttpServlet 
 {
 	/**
