@@ -48,7 +48,6 @@ public abstract class Node
 	 * @param node Node to test for equality
 	 * @return true if the Nodes are equal, otherwise false
 	 **/
-	@Override
 	abstract public boolean equals (Node node);
 	
 	
