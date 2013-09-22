@@ -62,12 +62,14 @@
         </jar>
     </target>	
 	
-	<target name="deploy">
+	<target name="deploy-web">
 		<copy todir="${deploydir}">
 			<fileset dir="src/html"/>
 		</copy>
+	</target>
+	<target name="deploy-servlet" depends="build">
 		<copy todir="${tomcatdir}/scottdjohnson">
-			<fileset dir="src/scottdjohnson"/>
+			<fileset dir="${builddir}/scottdjohnson"/>
 		</copy>
 	</target>
 	
@@ -88,8 +90,8 @@
 			<arg value="-R" />
 			<arg value="${deploydir}/javadoc" />
 		</exec>
-		<copy todir="${deploydir}">
-			<fileset dir="src/html"/>
+		<copy todir="${deploydir}/javadoc">
+			<fileset dir="javadoc"/>
 		</copy>
 	</target>
 
