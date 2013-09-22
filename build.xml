@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <project name="jsoup" default="create_run_jar">
+	<property environment="env"/>
 	<property name="sourcedir" value="src"/>
 	<property name="builddir" value="build/classes"/>
-	<property environment="env"/>
+	<property name="deploydir" value="/var/www/scrawlbot"/>
+	<property name="tomcatdir" value="/var/lib/tomcat7/webapps/ROOT/WEB-INF/classes"/>
+
 	<path id="JCrawlerApp.classpath">
         	<pathelement location="./lib/hibernate3.jar"/>
         	<pathelement location="./lib/jsoup-1.7.2.jar"/>
@@ -35,7 +38,7 @@
 		</exec>
 		
 	</target>
-	
+
 	<target depends="build" name="create_run_jar">
         <jar destfile="./jcrawler.jar" filesetmanifest="mergewithoutmain">
             <manifest>
@@ -58,5 +61,36 @@
 			<zipfileset excludes="META-INF/*.SF" src="./lib/commons-lang3-3.0.1.jar"/>
         </jar>
     </target>	
+	
+	<target name="deploy">
+		<copy todir="${deploydir}">
+			<fileset dir="src/html"/>
+		</copy>
+		<copy todir="${tomcatdir}/scottdjohnson">
+			<fileset dir="src/scottdjohnson"/>
+		</copy>
+	</target>
+	
+	<target name="javadoc" depends="clean-javadoc">
+		<mkdir dir="javadoc" />
+		<javadoc destdir="javadoc" sourcepath="${sourcedir}" packagenames="scottdjohnson.*"/>
+	</target>
+
+	<target name="clean-javadoc">
+		<exec executable="rm" failonerror="false">
+			<arg value="-R" />
+			<arg value="javadoc" />
+		</exec>
+	</target>
+	
+	<target name="deploy-javadoc" depends="javadoc">
+		<exec executable="rm" failonerror="false">
+			<arg value="-R" />
+			<arg value="${deploydir}/javadoc" />
+		</exec>
+		<copy todir="${deploydir}">
+			<fileset dir="src/html"/>
+		</copy>
+	</target>
 
 </project>
