@@ -14,9 +14,9 @@ function postAJAX()
 		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 	}
 	
-	xmlhttp.open("POST","http://scrawlbot.com:8080/JCrawlerServlet",false);
-	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-	xmlhttp.send("crawl_url=http://www.kcptech.com");
+	xmlhttp.open("POST","./JCrawlerServlet",false);
+	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xmlhttp.send("crawl_url=" + document.getElementById('urlkey').value);
 
 }
 
@@ -40,14 +40,15 @@ function getAJAX( getKey)
                 }
         }
 
-        xmlhttp.open("GET","http://scrawlbot.com:8080/JCrawlerServlet?urlkey=" + getKey,true);
+        xmlhttp.open("GET","./JCrawlerServlet?urlkey=" + getKey,true);
         xmlhttp.send();
 
 	return false;
+
 }
 
 </script>
-<title>SCrawlBot</title>
+<title>JCrawler</title>
 </head>
 <body onload="getAJAX(0);">
 <a href="/">HOME</a><p/>
