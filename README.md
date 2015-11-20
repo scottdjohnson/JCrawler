@@ -3,13 +3,17 @@ JCrawler
 
 Java based web crawler
 
-ant - build the application
+ant - build the jar application
+
+ant build-servlet - build as a servlet
 
 ant create_run_jar - create a single jar file for the final build (default)
 
-ant build - build only the classes
+ant build-app - build only the classes (best if Tomcat is not installed)
 
 ant clean - clean the source code
+
+ant javadoc - build the javadoc
 
 To execute the application:
 
