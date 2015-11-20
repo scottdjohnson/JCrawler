@@ -49,7 +49,7 @@ Servlet
 
 To run this as a servlet:
 
-	Compile with ant, then place everything in build/classes into the classes directy in WEB-INF
+	Compile with ant, then copy the classes in build/classes into ROOT/WEB-INF/classes and the HTML file into ROOT
 
 	Copy all the jar files in lib to the Tomcat lib directory (eg $CATALINA_HOME/lib)
 
