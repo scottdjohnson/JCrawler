@@ -47,35 +47,43 @@ public class JCrawlerServlet extends HttpServlet
     	 throws ServletException, IOException 
 	{
 		String urlkey = request.getParameter("urlkey");
-
-		org.hibernate.Session s = getSession();
-                Query query;
-
-		// If there is a specifc key, get it, otherwise get all of them
-		if (null != urlkey)
-			query = s.createQuery("from URLNode url_list where parent_key = " + urlkey);
-		else
-			query = s.createQuery("from URLNode url_list where parent_key = 0");
-
-		response.setContentType("text/html");
-		
-		// This is necessary for AJAX requests to this function
-		response.setHeader("Access-Control-Allow-Origin","*");
-
-		PrintWriter out = response.getWriter();
-		List list =  query.list();
-		s.close();
-
-		// Loop through all the results from the query
-		for (int i = 0; i < list.size(); i++)
+		org.hibernate.Session s = getSession();		
+		try
 		{
-			// Count the total number of results that have this URL as a parent
-			int count =( (Integer) getSession().createQuery("select count(*) from URLNode where parent_key="
-				+ ((URLNode)list.get(i)).getKey()).iterate().next() ).intValue();
+                	Query query;
 
-			// Print out this URL with the number of its children
-			out.println("<a href='' onclick=\"return getAJAX(" + ((URLNode)list.get(i)).getKey() + ");\">" 
-                        + ((URLNode)list.get(i)).getUrl() + "</a> (" + count + ")<br />");
+			// If there is a specifc key, get it, otherwise get all of them
+			if (null != urlkey)
+				query = s.createQuery("from URLNode url_list where parent_key = " + urlkey);
+			else
+				query = s.createQuery("from URLNode url_list where parent_key = 0");
+
+			response.setContentType("text/html");
+		
+			// This is necessary for AJAX requests to this function
+			response.setHeader("Access-Control-Allow-Origin","*");
+
+			PrintWriter out = response.getWriter();
+			List list =  query.list();
+
+			// Loop through all the results from the query
+			for (int i = 0; i < list.size(); i++)
+			{
+				// Count the total number of results that have this URL as a parent
+				int count =( (Integer) s.createQuery("select count(*) from URLNode where parent_key="
+					+ ((URLNode)list.get(i)).getKey()).iterate().next() ).intValue();
+	
+				// Print out this URL with the number of its children
+				out.println("<a href='' onclick=\"return getAJAX(" + ((URLNode)list.get(i)).getKey() + ");\">" 
+	                        + ((URLNode)list.get(i)).getUrl() + "</a> (" + count + ")<br />");
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		finally 
+		{
+			s.close();
 		}
 	}
 
@@ -98,11 +106,15 @@ public class JCrawlerServlet extends HttpServlet
 		// Store this first URL in the binary tree and save it to the DB
 		BinaryTree bt = new BinaryTree();
 		URLNode un = new URLNode(crawl_url);		 
+		URLNode.open();
+
 		bt.insertNode(un);
 		un.save();
 		
 		// Crawl the URL and its children
 		JCrawler.getLinksFromURL(bt, crawl_url, un.getKey());
+
+		URLNode.close();
 	}
 
 	/**
