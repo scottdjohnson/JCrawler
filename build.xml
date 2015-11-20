@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<project name="jsoup" default="create_run_jar">
+<project name="jsoup" default="deploy">
 	<property environment="env"/>
 	<property name="sourcedir" value="src"/>
 	<property name="builddir" value="build/classes"/>
 	<property name="deploydir" value="/var/www/scrawlbot"/>
-	<property name="tomcatdir" value="/var/lib/tomcat7/webapps/ROOT/WEB-INF/classes"/>
+	<property name="tomcatdir" value="/var/lib/tomcat7/webapps/ROOT/"/>
+        <property name="tomcat-classes-dir" value="/var/lib/tomcat7/webapps/ROOT/WEB-INF/classes"/>
 
-	<path id="JCrawlerApp.classpath">
+	<path id="JCrawlerDependencies.classpath">
         	<pathelement location="./lib/hibernate3.jar"/>
         	<pathelement location="./lib/jsoup-1.7.2.jar"/>
         	<pathelement location="./lib/mail.jar"/>
@@ -23,7 +24,7 @@
         </copy>
 
         <javac srcdir="${sourcedir}" destdir="${builddir}" includeantruntime="false">
-			<classpath refid="JCrawlerApp.classpath"/>
+			<classpath refid="JCrawlerDependencies.classpath"/>
 		</javac>
 	
     </target>
@@ -39,7 +40,7 @@
 		
 	</target>
 
-	<target depends="build" name="create_run_jar">
+	<target depends="build" name="build-jar">
         <jar destfile="./jcrawler.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="scottdjohnson.jcrawler.JCrawlerApp"/>
@@ -62,15 +63,13 @@
         </jar>
     </target>	
 	
-	<target name="deploy-web">
-		<copy todir="${deploydir}">
-			<fileset dir="src/html"/>
-		</copy>
-	</target>
-	<target name="deploy-servlet" depends="build">
-		<copy todir="${tomcatdir}/scottdjohnson">
+	<target name="deploy" depends="build">
+		<copy todir="${tomcat-classes-dir}/scottdjohnson">
 			<fileset dir="${builddir}/scottdjohnson"/>
 		</copy>
+		<copy todir="${tomcatdir}">
+                        <fileset dir="src/html"/>
+                </copy>
 	</target>
 	
 	<target name="javadoc" depends="clean-javadoc">
@@ -88,9 +87,9 @@
 	<target name="deploy-javadoc" depends="javadoc">
 		<exec executable="rm" failonerror="false">
 			<arg value="-R" />
-			<arg value="${deploydir}/javadoc" />
+			<arg value="${tomcatdir}/javadoc" />
 		</exec>
-		<copy todir="${deploydir}/javadoc">
+		<copy todir="${tomcatdir}/javadoc">
 			<fileset dir="javadoc"/>
 		</copy>
 	</target>
