@@ -31,7 +31,8 @@ public class JCrawlerApp
 	{
 		BinaryTree bt = new BinaryTree();
 		URLNode un = new URLNode(args[0]);
-		 
+		URLNode.open();
+
 		Validate.isTrue(args.length == 1, "usage: supply url to fetch");
 		String url 	= args[0];
 		
@@ -39,5 +40,6 @@ public class JCrawlerApp
 		un.save();
 		
 		JCrawler.getLinksFromURL(bt, url, un.getKey());
+		URLNode.close();
 	}
 }
