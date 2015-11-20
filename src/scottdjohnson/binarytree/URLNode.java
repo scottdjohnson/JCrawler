@@ -16,7 +16,8 @@ public class URLNode extends Node
 	String url;
 	private long key;
 	private long parentKey;
-
+	private static org.hibernate.Session session;
+			
 	/**
 	 * Default constructor
 	 **/
@@ -89,31 +90,35 @@ public class URLNode extends Node
 		return this.url.compareTo( ((URLNode)node).getUrl() ) == 0;
 	}
 	
+
+	public static void open()
+	{
+                session = new Configuration().configure().buildSessionFactory().openSession();
+	}
+
 	/**
 	 * Save this in the database using a Hibernate session
-	 * 
+	 *
 	 **/
 	public void save()
 	{
 		try {
-			org.hibernate.Session session = null;
-			
-			// This step will read hibernate.cfg.xml and prepare hibernate for use
-			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-			session = sessionFactory.openSession();
 			
 			org.hibernate.Transaction tx = session.beginTransaction();
 			
 			//Create new instance of Contact and set values in it by reading them from form object
 			session.saveOrUpdate(this);
 			tx.commit();
-			session.flush();
-			session.close();
 		}
 		catch (Exception e)
 		{
-			
 		}
+	}
+
+	public static void close()
+	{
+		session.flush();
+		session.close();
 	}
 
 	/**
