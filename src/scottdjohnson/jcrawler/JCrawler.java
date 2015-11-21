@@ -33,7 +33,8 @@ public class JCrawler
 	 */
 	public static void getLinksFromURL( BinaryTree bt, String url, long parent)
 	{		
-		try{
+		try
+		{
 			Document doc = Jsoup.connect(url).get();
 			Elements links = doc.select("a[href]");
 			int size		= links.size();
@@ -47,27 +48,20 @@ public class JCrawler
 				//	external web site. Not an entirely safe assumption but ok for this demo
 				
 				URLNode un = new URLNode( link.attr("abs:href"), parent);
+				URI u           = new URI(link.attr("href"));
 				
+				// if link is not already in tree, store it and recurse	
 				if ( !bt.isNodeInTree( un ) )
 				{
 					bt.insertNode( un );
 					un.save();
 					System.out.println("Inserting URL: " + link.attr("href"));
-				}
-			}				
-			
-			// We now go through the links again and look recursively, except for links we have already looked at
-			for (int i = 0; i < size; i++)
-			{
-				Element link 	= links.get(i);
-				URLNode un 	= new URLNode( link.attr("abs:href"), parent);
-				URI u           = new URI(link.attr("href"));
 
-				if ( !bt.isNodeInTree( un ) )
+					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
 						getLinksFromURL( bt, un.getUrl(), un.getKey() );
-
-			}
+				}
+			}				
 		}
 		catch(URISyntaxException e)
 		{
