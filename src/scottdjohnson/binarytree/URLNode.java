@@ -17,7 +17,8 @@ public class URLNode extends Node
 	private long key;
 	private long parentKey;
 	private static org.hibernate.Session session;
-			
+	private static  org.hibernate.Transaction tx;
+	
 	/**
 	 * Default constructor
 	 **/
@@ -94,6 +95,7 @@ public class URLNode extends Node
 	public static void open()
 	{
                 session = new Configuration().configure().buildSessionFactory().openSession();
+ 		tx = session.beginTransaction();
 	}
 
 	/**
@@ -103,9 +105,6 @@ public class URLNode extends Node
 	public void save()
 	{
 		try {
-			
-			org.hibernate.Transaction tx = session.beginTransaction();
-			
 			//Create new instance of Contact and set values in it by reading them from form object
 			session.saveOrUpdate(this);
 			tx.commit();
