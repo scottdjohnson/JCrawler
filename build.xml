@@ -15,7 +15,7 @@
 		<pathelement location="${env.CATALINA_HOME}/lib/servlet-api.jar" />
 	</path>
 	
-	<target name="build-servlet">
+	<target name="build">
 		<mkdir dir="${builddir}"/>
 		<copy includeemptydirs="false" todir="${builddir}">
 			<fileset dir="misc">
@@ -79,7 +79,7 @@
 		</jar>
 	</target>	
 	
-	<target name="deploy-all" depends="deploy-servlet,deploy-web,deploy-javadoc" />
+	<target name="deploy-all" depends="deploy,deploy-javadoc" />
 	
 	<target name="deploy" depends="build">
 		<copy todir="${tomcat-classes-dir}/scottdjohnson">
