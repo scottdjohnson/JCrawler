@@ -3,9 +3,7 @@ JCrawler
 
 Java based web crawler
 
-ant - build the and deploy to Tomcat
-
-ant deploy - deploy servlet to Tomcat
+ant - build classes, javadoc and war fie
 
 ant build-jar - create a single jar file for running app from the command line (for testing)
 
