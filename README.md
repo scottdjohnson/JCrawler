@@ -53,9 +53,5 @@ Servlet
 
 To run this as a servlet:
 
-	Compile with ant, then copy the classes in build/classes into ROOT/WEB-INF/classes and the HTML file into ROOT
-
-	Copy all the jar files in lib to the Tomcat lib directory (eg $CATALINA_HOME/lib)
-
-	Update web.xml to point the JCrawler, and scottdjohnson.jcrawler.JCrawlerServlet
-
+	ant
+	deploy dist/JCrawler.war to your Tomcat webapps directory
