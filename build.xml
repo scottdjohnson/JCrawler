@@ -42,6 +42,7 @@
 	<target name="build-war" depends="build,javadoc">
 		<war destfile="${dist.dir}/${war.file}" webxml="${source.dir}/web.xml">
 			<fileset dir="${html.dir}"/>
+			<fileset dir="${dist.dir}" includes="javadoc/**"/>
 			<classes dir = "${classes.dir}"/>
 			<lib dir = "${lib.dir}"/>
 		</war>
@@ -85,7 +86,7 @@
 	
 	<target name="javadoc" depends="clean-javadoc">
 		<mkdir dir="javadoc" />
-		<javadoc destdir="javadoc" sourcepath="${source.dir}" packagenames="scottdjohnson.*"/>
+		<javadoc destdir="${dist.dir}/javadoc" sourcepath="${source.dir}" packagenames="scottdjohnson.*"/>
 	</target>
 
 	<target name="clean-javadoc">
