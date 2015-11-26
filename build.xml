@@ -1,11 +1,20 @@
 <?xml version="1.0"?>
-<project name="jsoup" default="deploy">
+<project name="JCrawler" default="build-war">
 	<property environment="env"/>
-	<property name="sourcedir" value="src"/>
-	<property name="builddir" value="build/classes"/>
-	<property name="deploydir" value="/var/www/scrawlbot"/>
-	<property name="tomcatdir" value="/var/lib/tomcat7/webapps/ROOT/"/>
-        <property name="tomcat-classes-dir" value="/var/lib/tomcat7/webapps/ROOT/WEB-INF/classes"/>
+
+        <property name="war.file" value="JCrawler.war"/>
+        <property name="jar.file" value="JCrawler.jar"/>
+
+	<property name="lib.dir" value="lib"/>
+	<property name="source.dir" value="src"/>
+        <property name="html.dir" value="src/html"/>
+
+        <property name="dist.dir" value="dist"/>
+        <property name="build.dir" value="build"/>
+        <property name="classes.dir" value="build/classes"/>
+
+	<property name="tomcat.deploy.dir" value="/var/lib/tomcat7/webapps"/>
+        <property name="tomcat.home" value="/usr/share/tomcat7/"/>
 
 	<path id="JCrawlerDependencies.classpath">
 		<pathelement location="./lib/hibernate3.jar"/>
@@ -16,33 +25,26 @@
 	</path>
 	
 	<target name="build">
-		<mkdir dir="${builddir}"/>
-		<copy includeemptydirs="false" todir="${builddir}">
+		<mkdir dir="${classes.dir}"/>
+		<copy includeemptydirs="false" todir="${classes.dir}">
 			<fileset dir="misc">
 				<exclude name="**/*.launch"/>
 				<exclude name="**/*.java"/>
 			</fileset>
 		</copy>
 
-		<javac srcdir="${sourcedir}" destdir="${builddir}" includeantruntime="false">
+		<javac srcdir="${source.dir}" destdir="${classes.dir}" includeantruntime="false">
 			<classpath refid="JCrawlerDependencies.classpath"/>
 		</javac>
 	
     </target>
-
-	<target name="build-app">
-		<mkdir dir="${builddir}"/>
-			<copy includeemptydirs="false" todir="${builddir}">
-				<fileset dir="misc">
-					<exclude name="**/*.launch"/>
-					<exclude name="**/*.java"/>
-				</fileset>
-			</copy>
-		
-		<javac srcdir="${sourcedir}" destdir="${builddir}" includeantruntime="false" excludes="**/JCrawlerServlet.java">
-			<classpath refid="JCrawlerDependencies.classpath"/>
-		</javac>
-		
+	
+	<target name="build-war" depends="build,javadoc">
+		<war destfile="${dist.dir}/${war.file}" webxml="${source.dir}/web.xml">
+			<fileset dir="${html.dir}"/>
+			<classes dir = "${classes.dir}"/>
+			<lib dir = "${lib.dir}"/>
+		</war>
 	</target>
 
 	<target name="clean">
@@ -51,18 +53,20 @@
 			<arg value="build" />
 		</exec>
 		<exec executable="rm">
-			<arg value="jcrawler.jar" />
+			<arg value="${dist.dir}/${jar.file}" />
 		</exec>
-		
+                <exec executable="rm">
+                        <arg value="${dist.dir}/${war.file}" />
+                </exec>		
 	</target>
 
 	<target depends="build" name="build-jar">
-        <jar destfile="./jcrawler.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="${dist.dir}/${jar.file}" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="scottdjohnson.jcrawler.JCrawlerApp"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-			<fileset dir="${builddir}"/>
+			<fileset dir="${classes.dir}"/>
 			<zipfileset excludes="META-INF/*.SF" src="./lib/hibernate3.jar"/>
 			<zipfileset excludes="META-INF/*.SF" src="./lib/jsoup-1.7.2.jar"/>
 			<zipfileset excludes="META-INF/*.SF" src="./lib/log4j-1.2.9.jar"/>
@@ -79,20 +83,9 @@
 		</jar>
 	</target>	
 	
-	<target name="deploy-all" depends="deploy,deploy-javadoc" />
-	
-	<target name="deploy" depends="build">
-		<copy todir="${tomcat-classes-dir}/scottdjohnson">
-			<fileset dir="${builddir}/scottdjohnson"/>
-		</copy>
-		<copy todir="${tomcatdir}">
-                        <fileset dir="src/html"/>
-                </copy>
-	</target>
-	
 	<target name="javadoc" depends="clean-javadoc">
 		<mkdir dir="javadoc" />
-		<javadoc destdir="javadoc" sourcepath="${sourcedir}" packagenames="scottdjohnson.*"/>
+		<javadoc destdir="javadoc" sourcepath="${source.dir}" packagenames="scottdjohnson.*"/>
 	</target>
 
 	<target name="clean-javadoc">
@@ -102,14 +95,4 @@
 		</exec>
 	</target>
 	
-	<target name="deploy-javadoc" depends="javadoc">
-		<exec executable="rm" failonerror="false">
-			<arg value="-R" />
-			<arg value="${tomcatdir}/javadoc" />
-		</exec>
-		<copy todir="${tomcatdir}/javadoc">
-			<fileset dir="javadoc"/>
-		</copy>
-	</target>
-
 </project>
