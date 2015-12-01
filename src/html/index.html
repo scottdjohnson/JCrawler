@@ -5,6 +5,23 @@
 body { font-family: Arial; }
 </style>
 <script>
+
+function deleteAll()
+{
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+        {
+                xmlhttp = new XMLHttpRequest();
+        }
+        else
+        {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        xmlhttp.open("DELETE","./JCrawlerServlet",false);
+        xmlhttp.send();
+}
+
 function postAJAX()
 {
 	var xmlhttp;
@@ -58,6 +75,8 @@ function getAJAX( getKey)
 <b>Crawl a URL</b><br />
 <input type="text" id="urlkey" value="http://" />
 <button type="button" onclick="postAJAX();getAJAX(0);">Submit</button>
+<br />
+<button type="button" onclick="deleteAll();getAJAX(0);">Reset</button>
 <br />
 <hr />
 <b>Database-stored URL crawls</b> (click to see links found under the given URL) <p />
