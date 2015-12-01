@@ -111,6 +111,7 @@ public class URLNode extends Node
 		}
 		catch (Exception e)
 		{
+			System.out.println(e.getMessage());
 		}
 	}
 
