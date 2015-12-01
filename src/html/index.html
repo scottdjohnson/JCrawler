@@ -79,13 +79,18 @@ function getAJAX( getKey)
 <button type="button" onclick="deleteAll();getAJAX(0);">Reset</button>
 <br />
 <hr />
-<b>Database-stored URL crawls</b> (click to see links found under the given URL) <p />
+<b>Database-stored URL crawls</b> (click links, if any, to see results of the crawl) <p />
 <div id="urls">
 </div>
 <p />
 <b>About</b> <br />
 
-This tool is a simple example of a Java-based web crawler. Enter a complete url (beginning with "http://") and that page will be crawled, its links will be stored in the database and any links it finds which are also in that domain will be crawled as well, recursively. It is a prototype and therefore has a number of limitations. For example, it assumes that an absolute URL found on a web page is external to that domain and therefore does not crawl it. However, it is a proof of concept that such a tool can be created using Java Hibernate, JSoup and AJAX.
+This tool is a simple Java-based web crawler. Enter a complete url (beginning with "http://") and that page will be crawled, its links will be stored in the database and any links it finds which are also in that domain will be crawled as well, recursively. It assumes that an absolute URL found on a web page is external to that domain and therefore does not crawl it. 
+<p />
+<p>
+Front page: HTML with JavaScript and AJAX
+<br />
+Back end: Java Servlet via Tomcat 7, MySQL 5.5.34, Linux (Ubuntu 13.04)
 <p />
 <a href="https://github.com/scottdjohnson/JCrawler">Source code on gituhb</a>
 <p />
