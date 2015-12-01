@@ -5,6 +5,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import java.util.List;
+
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -80,6 +81,7 @@ public class JCrawlerServlet extends HttpServlet
 		}
 		catch (Exception e)
 		{
+			 System.out.println(e.getMessage());
 		}
 		finally 
 		{
@@ -116,6 +118,46 @@ public class JCrawlerServlet extends HttpServlet
 
 		URLNode.close();
 	}
+
+        /**
+         * Delete the contents of the database
+         *
+         * @param request The request to get from the servlet
+         * @param response The response back from the servlet
+         **/
+        public void doDelete(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException
+	{
+		org.hibernate.Session s = getSession();
+		org.hibernate.Transaction tx = s.beginTransaction();
+
+                response.setContentType("text/html");
+
+                // This is necessary for AJAX requests to this function
+                response.setHeader("Access-Control-Allow-Origin","*");
+
+		try
+		{
+			Query query = s.createQuery("from URLNode url_list");
+			List list = query.list();
+
+			for (int i = 0; i < list.size(); i++)
+			{
+				s.delete( (URLNode)list.get(i) );
+			}
+
+			tx.commit();
+		}
+		catch (Exception e)
+		{
+			 System.out.println(e.getMessage());
+		}
+		finally
+		{
+			s.flush();
+			s.close();
+		}		
+	}	
 
 	/**
 	 * Create a new Hibernate session
