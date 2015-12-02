@@ -23,6 +23,7 @@ import java.io.IOException;
 import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
 import scottdjohnson.jcrawler.JCrawler;
+import scottdjohnson.database.DBConnector;
 
 /**
  * A servlet class for posting new URLs to crawl and getting URL crawl results form the database
@@ -47,46 +48,36 @@ public class JCrawlerServlet extends HttpServlet
   	public void doGet(HttpServletRequest request, HttpServletResponse response)
     	 throws ServletException, IOException 
 	{
+		List list;
 		String urlkey = request.getParameter("urlkey");
-		org.hibernate.Session s = getSession();		
-		try
+		PrintWriter out = response.getWriter();
+
+		DBConnector.open();
+
+		response.setContentType("text/html");
+                // This is necessary for AJAX requests to this function
+                response.setHeader("Access-Control-Allow-Origin","*");
+
+		// If there is a specifc key, get it, otherwise get all of them
+                if (null != urlkey)
+                	list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlkey);
+		else
+			list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
+
+		// Loop through all the results from the query
+		for (int i = 0; i < list.size(); i++)
 		{
-                	Query query;
+			// Count the total number of results that have this URL as a parent
+			int count =  (int)(DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
+				+ ((URLNode)list.get(i)).getKey())).get(0);
 
-			// If there is a specifc key, get it, otherwise get all of them
-			if (null != urlkey)
-				query = s.createQuery("from URLNode url_list where parent_key = " + urlkey);
-			else
-				query = s.createQuery("from URLNode url_list where parent_key = 0");
-
-			response.setContentType("text/html");
-		
-			// This is necessary for AJAX requests to this function
-			response.setHeader("Access-Control-Allow-Origin","*");
-
-			PrintWriter out = response.getWriter();
-			List list =  query.list();
-
-			// Loop through all the results from the query
-			for (int i = 0; i < list.size(); i++)
-			{
-				// Count the total number of results that have this URL as a parent
-				int count =( (Integer) s.createQuery("select count(*) from URLNode where parent_key="
-					+ ((URLNode)list.get(i)).getKey()).iterate().next() ).intValue();
-	
-				// Print out this URL with the number of its children
-				out.println("<a href='' onclick=\"return getAJAX(" + ((URLNode)list.get(i)).getKey() + ");\">" 
-	                        + ((URLNode)list.get(i)).getUrl() + "</a> (" + count + ")<br />");
-			}
+			// Print out this URL with the number of its children
+			out.println("<a href='' onclick=\"return getAJAX(" + ((URLNode)list.get(i)).getKey() + ");\">" 
+				+ ((URLNode)list.get(i)).getUrl() + "</a> (" + count + ")<br />");
 		}
-		catch (Exception e)
-		{
-			 System.out.println(e.getMessage());
-		}
-		finally 
-		{
-			s.close();
-		}
+
+
+		DBConnector.close();
 	}
 
 	/**
@@ -108,15 +99,15 @@ public class JCrawlerServlet extends HttpServlet
 		// Store this first URL in the binary tree and save it to the DB
 		BinaryTree bt = new BinaryTree();
 		URLNode un = new URLNode(crawl_url);		 
-		URLNode.open();
+		DBConnector.open();
 
 		bt.insertNode(un);
-		un.save();
+		DBConnector.save( un );
 		
 		// Crawl the URL and its children
 		JCrawler.getLinksFromURL(bt, crawl_url, un.getKey());
 
-		URLNode.close();
+		DBConnector.close();
 	}
 
         /**
@@ -128,35 +119,14 @@ public class JCrawlerServlet extends HttpServlet
         public void doDelete(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException
 	{
-		org.hibernate.Session s = getSession();
-		org.hibernate.Transaction tx = s.beginTransaction();
-
                 response.setContentType("text/html");
 
                 // This is necessary for AJAX requests to this function
                 response.setHeader("Access-Control-Allow-Origin","*");
 
-		try
-		{
-			Query query = s.createQuery("from URLNode url_list");
-			List list = query.list();
-
-			for (int i = 0; i < list.size(); i++)
-			{
-				s.delete( (URLNode)list.get(i) );
-			}
-
-			tx.commit();
-		}
-		catch (Exception e)
-		{
-			 System.out.println(e.getMessage());
-		}
-		finally
-		{
-			s.flush();
-			s.close();
-		}		
+		DBConnector.open();
+		DBConnector.deleteFromQuery("from URLNode url_list");
+		DBConnector.close();
 	}	
 
 	/**
