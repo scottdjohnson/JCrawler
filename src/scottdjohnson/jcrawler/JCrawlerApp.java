@@ -13,6 +13,7 @@ import java.io.IOException;
 import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
 import scottdjohnson.jcrawler.JCrawler;
+import scottdjohnson.database.DBConnector;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Query;
@@ -42,50 +43,48 @@ public class JCrawlerApp
 		{
 			BinaryTree bt = new BinaryTree();
 			URLNode un = new URLNode(args[0]);
-			URLNode.open();
+			DBConnector.open();
 
 			Validate.isTrue(args.length == 1, "usage: supply url to fetch");
 			String url 	= args[0];
 			
 			bt.insertNode(un);
-			un.save();
+			DBConnector.save(un);
 			
 			JCrawler.getLinksFromURL(bt, url, un.getKey());
-			URLNode.close();
+			DBConnector.close();
 		}
 		else
 		{
-        	        org.hibernate.Session s = new Configuration().configure().buildSessionFactory().openSession();
-	                org.hibernate.Transaction tx = s.beginTransaction();
 
-			System.out.println("else");
+			List list;
+			String urlkey = "0";//request.getParameter("urlkey");
+			//PrintWriter out = response.getWriter();
 
-                	try
-                	{
-                		System.out.println("try");
-			        Query query = s.createQuery("from URLNode url_list");
-				System.out.println("after query");
-                	        List list = query.list();
+			DBConnector.open();
 
-				System.out.println("size " + list.size());	
-	                        for (int i = 0; i < list.size(); i++)
-	                        {
-					System.out.println(((URLNode)list.get(i)).getKey());
-	                                s.delete( (URLNode)list.get(i) );
-	                        }
 
-				tx.commit();
-                	}
-                	catch (Exception e)
-                	{
-				System.out.println(e.getMessage());
-                	}
-                	finally
-                	{
-				s.flush();
-                	        s.close();
-                	}
+			// If there is a specifc key, get it, otherwise get all of them
+	                if (null != urlkey)
+        	        	list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlkey);
+			else
+				list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
 
+			// Loop through all the results from the query
+			for (int i = 0; i < list.size(); i++)
+			{
+				// Count the total number of results that have this URL as a parent
+				int count =(int) ((DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
+					+ ((URLNode)list.get(i)).getKey())).get(0));
+
+				// Print out this URL with the number of its children
+				System.out.println("<a href='' onclick=\"return getAJAX(" + Integer.toString((int)((URLNode)list.get(i)).getKey() ) + ");\">" 
+					+ ((URLNode)list.get(i)).getUrl() + "</a> (" + Integer.toString(count) + ")<br />");
+			}
+
+
+			DBConnector.close();
 		}
+
 	}
 }
