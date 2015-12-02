@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
+import scottdjohnson.database.DBConnector;
 
 /**
  * JCrawler provides the basic functionlity for crawling a Web URL.
@@ -54,7 +55,7 @@ public class JCrawler
 				if ( !bt.isNodeInTree( un ) )
 				{
 					bt.insertNode( un );
-					un.save();
+					DBConnector.save( un );
 					System.out.println("Inserting URL: " + link.attr("href"));
 
 					// Don't recurse absolute URLs, assume they are external
