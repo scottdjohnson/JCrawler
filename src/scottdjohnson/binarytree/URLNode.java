@@ -1,9 +1,7 @@
 package scottdjohnson.binarytree;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
 import scottdjohnson.binarytree.Node;
+import scottdjohnson.database.DBConnector;
 
 /**
  * An implementation of the abstract Node class, where the data in a Node is a URL
@@ -16,8 +14,6 @@ public class URLNode extends Node
 	String url;
 	private long key;
 	private long parentKey;
-	private static org.hibernate.Session session;
-	private static  org.hibernate.Transaction tx;
 	
 	/**
 	 * Default constructor
@@ -89,36 +85,6 @@ public class URLNode extends Node
 	{
 		System.out.println("Compare: " + this.url + " " + ((URLNode)node).getUrl());
 		return this.url.compareTo( ((URLNode)node).getUrl() ) == 0;
-	}
-	
-
-	public static void open()
-	{
-                session = new Configuration().configure().buildSessionFactory().openSession();
- 		tx = session.beginTransaction();
-	}
-
-	/**
-	 * Save this in the database using a Hibernate session
-	 *
-	 **/
-	public void save()
-	{
-		try {
-			//Create new instance of Contact and set values in it by reading them from form object
-			session.saveOrUpdate(this);
-			tx.commit();
-		}
-		catch (Exception e)
-		{
-			System.out.println(e.getMessage());
-		}
-	}
-
-	public static void close()
-	{
-		session.flush();
-		session.close();
 	}
 
 	/**
