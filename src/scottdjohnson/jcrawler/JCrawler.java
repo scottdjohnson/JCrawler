@@ -9,6 +9,8 @@ import org.jsoup.select.Elements;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 
 import scottdjohnson.binarytree.URLNode;
 import scottdjohnson.binarytree.BinaryTree;
@@ -32,13 +34,13 @@ public class JCrawler
 	 * @param url The URL to crawl
 	 * @param parent The parent key in the database for this URL
 	 */
-	public static void getLinksFromURL( BinaryTree bt, String url, long parent)
+	public static void crawlLinksFromURL( BinaryTree bt, String url, long parent)
 	{		
 		try
 		{
-			Document doc = Jsoup.connect(url).get();
-			Elements links = doc.select("a[href]");
-			int size		= links.size();
+			Document doc 	= Jsoup.connect(url).get();
+			Elements links 	= doc.select("a[href]");
+			int size	= links.size();
 		
 			// First we store all the URLs at the current level
 			for (int i = 0; i < size; i++)
@@ -48,8 +50,8 @@ public class JCrawler
 				// We are going to assume that an absolute URL points to an external
 				//	external web site. Not an entirely safe assumption but ok for this demo
 				
-				URLNode un = new URLNode( link.attr("abs:href"), parent);
-				URI u           = new URI(link.attr("href"));
+				URLNode un 	= new URLNode( link.attr("abs:href"), parent);
+				URI u		= new URI(link.attr("href"));
 				
 				// if link is not already in tree, store it and recurse	
 				if ( !bt.isNodeInTree( un ) )
@@ -60,7 +62,7 @@ public class JCrawler
 
 					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
-						getLinksFromURL( bt, un.getUrl(), un.getKey() );
+						crawlLinksFromURL( bt, un.getUrl(), un.getKey() );
 				}
 			}				
 		}
@@ -76,4 +78,52 @@ public class JCrawler
 
 	}
 
+	public static void deleteAllUrls()
+	{
+		DBConnector.open();
+		DBConnector.deleteFromQuery("from URLNode url_list");
+		DBConnector.close();
+	}
+
+	public static void getUrls(Integer urlKey, PrintWriter out)
+	{
+		List list;
+
+		DBConnector.open();
+
+		// If there is a specifc key, get it, otherwise get all of them
+                if (null != urlKey)
+       	        	list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
+		else
+			list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
+
+		// Loop through all the results from the query
+		for (int i = 0; i < list.size(); i++)
+		{
+			// Count the total number of results that have this URL as a parent
+			int count =(int) ((DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
+				+ ((URLNode)list.get(i)).getKey())).get(0));
+
+			// Print out this URL with the number of its children
+			out.println("<a href='' onclick=\"return getAJAX(" + Integer.toString((int)((URLNode)list.get(i)).getKey() ) + ");\">" 
+				+ ((URLNode)list.get(i)).getUrl() + "</a> (" + Integer.toString(count) + ")<br />");
+		}
+
+		// Don't close or we might close System.out!
+		out.flush();
+		DBConnector.close();		
+	}
+
+	public static void addUrl(String url)
+	{
+		BinaryTree bt = new BinaryTree();
+		URLNode un = new URLNode(url);
+		DBConnector.open();
+
+		bt.insertNode(un);
+		DBConnector.save(un);
+		
+		JCrawler.crawlLinksFromURL(bt, url, un.getKey());
+		DBConnector.close();
+	}
 }
