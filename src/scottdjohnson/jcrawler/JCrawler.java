@@ -78,6 +78,10 @@ public class JCrawler
 
 	}
 
+	/**
+	* Delete all the URLs currently stored in the database, including children
+	* 
+	**/
 	public static void deleteAllUrls()
 	{
 		DBConnector.open();
@@ -85,6 +89,12 @@ public class JCrawler
 		DBConnector.close();
 	}
 
+	/**
+	* Get the URL in the database, and its children, designated by the key, write results to out
+	*
+	* @param urlKey The key of the URL to get from the database
+	* @param out The Writer to write the results to
+	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
 		List list;
@@ -114,6 +124,11 @@ public class JCrawler
 		DBConnector.close();		
 	}
 
+	/**
+	* Add the URL and its children to the database
+	*
+	* @param url The URL to crawl and store in the database
+	**/
 	public static void addUrl(String url)
 	{
 		BinaryTree bt = new BinaryTree();
