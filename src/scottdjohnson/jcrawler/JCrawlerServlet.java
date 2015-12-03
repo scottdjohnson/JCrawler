@@ -32,7 +32,7 @@ import scottdjohnson.database.DBConnector;
  *
  * @author Scott Johnson
  **/
-public class JCrawlerServlet extends HttpServlet 
+public class JCrawlerServlet extends HttpServlet
 {
 	/**
 	 * Get the results of a previous JCrawler URL crawl from the database
@@ -48,36 +48,11 @@ public class JCrawlerServlet extends HttpServlet
   	public void doGet(HttpServletRequest request, HttpServletResponse response)
     	 throws ServletException, IOException 
 	{
-		List list;
-		String urlkey = request.getParameter("urlkey");
-		PrintWriter out = response.getWriter();
-
-		DBConnector.open();
-
-		response.setContentType("text/html");
+                response.setContentType("text/html");
                 // This is necessary for AJAX requests to this function
                 response.setHeader("Access-Control-Allow-Origin","*");
 
-		// If there is a specifc key, get it, otherwise get all of them
-                if (null != urlkey)
-                	list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlkey);
-		else
-			list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
-
-		// Loop through all the results from the query
-		for (int i = 0; i < list.size(); i++)
-		{
-			// Count the total number of results that have this URL as a parent
-			int count =  (int)(DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
-				+ ((URLNode)list.get(i)).getKey())).get(0);
-
-			// Print out this URL with the number of its children
-			out.println("<a href='' onclick=\"return getAJAX(" + ((URLNode)list.get(i)).getKey() + ");\">" 
-				+ ((URLNode)list.get(i)).getUrl() + "</a> (" + count + ")<br />");
-		}
-
-
-		DBConnector.close();
+		JCrawler.getUrls(Integer.parseInt( request.getParameter("urlkey")), response.getWriter() );
 	}
 
 	/**
@@ -94,20 +69,7 @@ public class JCrawlerServlet extends HttpServlet
 		// This is necessary for AJAX requests to this function
 		response.setHeader("Access-Control-Allow-Origin","*");
 
-		String crawl_url = request.getParameter("crawl_url");
-
-		// Store this first URL in the binary tree and save it to the DB
-		BinaryTree bt = new BinaryTree();
-		URLNode un = new URLNode(crawl_url);		 
-		DBConnector.open();
-
-		bt.insertNode(un);
-		DBConnector.save( un );
-		
-		// Crawl the URL and its children
-		JCrawler.getLinksFromURL(bt, crawl_url, un.getKey());
-
-		DBConnector.close();
+		JCrawler.addUrl( request.getParameter("crawl_url") );
 	}
 
         /**
@@ -124,17 +86,7 @@ public class JCrawlerServlet extends HttpServlet
                 // This is necessary for AJAX requests to this function
                 response.setHeader("Access-Control-Allow-Origin","*");
 
-		DBConnector.open();
-		DBConnector.deleteFromQuery("from URLNode url_list");
-		DBConnector.close();
+		JCrawler.deleteAllUrls();
 	}	
-
-	/**
-	 * Create a new Hibernate session
-	 **/
-	private org.hibernate.Session getSession()
-	{
-		return new Configuration().configure().buildSessionFactory().openSession();
-	}
 }
 
