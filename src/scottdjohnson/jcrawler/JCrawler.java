@@ -34,7 +34,7 @@ public class JCrawler
 	 * @param url The URL to crawl
 	 * @param parent The parent key in the database for this URL
 	 */
-	public static void crawlLinksFromURL( BinaryTree bt, String url, long parent)
+	public static void crawlLinksFromUrl( BinaryTree bt, String url, long parent)
 	{		
 		try
 		{
@@ -62,7 +62,7 @@ public class JCrawler
 
 					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
-						crawlLinksFromURL( bt, un.getUrl(), un.getKey() );
+						crawlLinksFromUrl( bt, un.getUrl(), un.getKey() );
 				}
 			}				
 		}
@@ -90,6 +90,61 @@ public class JCrawler
 	}
 
 	/**
+	* Delete URL from key, and its children
+	*
+	* @param urlKey The key of the URL to delete
+	**/
+	public static void deleteUrlAndChildren(Integer urlKey)
+	{
+                DBConnector.open();
+		deleteUrlAndChildrenRecurse(urlKey);
+                DBConnector.close();
+	}
+
+        /**
+        * Recursing function to delete a URL and its children
+        *
+        * @param urlKey The key of the URL to delete
+        **/
+	public static void deleteUrlAndChildrenRecurse(Integer urlKey)
+	{
+                // Get list of children with this as parent
+                List list = getChildren(urlKey);
+
+                // Recurse on children
+                if (null != list)
+                        for (int i = 0; i < list.size(); i++)
+                                deleteUrlAndChildrenRecurse( (int)((URLNode)list.get(i)).getKey() );
+
+                DBConnector.deleteFromQuery("from URLNode url_list where url_key=" + urlKey);
+	}
+
+	/**
+	* Get all objects with this as the parent. Expects DBConnector to already be open
+	* 
+	* @param urlKey The key whose children this function returns
+	**/
+	public static List getChildren(Integer urlKey)
+	{
+		List list = null;
+
+		try
+		{
+                	// If there is a specifc key, get it, otherwise get all of them
+                	if (null != urlKey)
+                	        list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
+                	else
+                	        list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+
+		return list;
+	}
+
+	/**
 	* Get the URL in the database, and its children, designated by the key, write results to out
 	*
 	* @param urlKey The key of the URL to get from the database
@@ -97,15 +152,9 @@ public class JCrawler
 	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
-		List list;
-
 		DBConnector.open();
 
-		// If there is a specifc key, get it, otherwise get all of them
-                if (null != urlKey)
-       	        	list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
-		else
-			list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
+		List list = getChildren(urlKey);
 
 		// Loop through all the results from the query
 		for (int i = 0; i < list.size(); i++)
@@ -138,7 +187,7 @@ public class JCrawler
 		bt.insertNode(un);
 		DBConnector.save(un);
 		
-		JCrawler.crawlLinksFromURL(bt, url, un.getKey());
+		JCrawler.crawlLinksFromUrl(bt, url, un.getKey());
 		DBConnector.close();
 	}
 }
