@@ -15,8 +15,8 @@ import org.hibernate.Query;
 public class DBConnector
 {
 
-	private static org.hibernate.Session session;
-	private static  org.hibernate.Transaction tx;
+	private static org.hibernate.Session session = null;
+	private static  org.hibernate.Transaction tx = null;
 
 	/**
 	* Private constructor so the class cannot be constructed
@@ -32,8 +32,11 @@ public class DBConnector
 	**/
 	public static void open()
 	{
-                session = new Configuration().configure().buildSessionFactory().openSession();
- 		tx = session.beginTransaction();
+		if ( null == session || !session.isOpen())
+                {
+			session = new Configuration().configure().buildSessionFactory().openSession();
+ 			tx = session.beginTransaction();
+		}
 	}
 
 	/**
