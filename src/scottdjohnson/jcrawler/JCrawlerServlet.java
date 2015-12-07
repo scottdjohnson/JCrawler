@@ -48,7 +48,7 @@ public class JCrawlerServlet extends HttpServlet
   	public void doGet(HttpServletRequest request, HttpServletResponse response)
     	 throws ServletException, IOException 
 	{
-                response.setContentType("text/html");
+                response.setContentType("application/json");
                 // This is necessary for AJAX requests to this function
                 response.setHeader("Access-Control-Allow-Origin","*");
 
