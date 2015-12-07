@@ -56,7 +56,17 @@ function getAJAX( getKey)
         {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200)
                 {
-                        document.getElementById("urls").innerHTML=xmlhttp.responseText;
+			var responseText = xmlhttp.responseText;
+                        var jsonParsed = JSON.parse(responseText);
+			var urlOutput = "";
+
+			for (var i = 0; i < jsonParsed.URLs.length; i++)
+			{
+				urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
+				urlOutput += jsonParsed.URLs[i].URL + "<a/> (" + jsonParsed.URLs[i].count + ")<br />";
+			}
+
+			document.getElementById("urls").innerHTML = urlOutput;
                 }
         }
 
