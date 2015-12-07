@@ -155,18 +155,31 @@ public class JCrawler
 		DBConnector.open();
 
 		List list = getChildren(urlKey);
+		out.println("{\"URLs\":[");
 
 		// Loop through all the results from the query
 		for (int i = 0; i < list.size(); i++)
 		{
+			int currentKey = (int)((URLNode)list.get(i)).getKey();
+
 			// Count the total number of results that have this URL as a parent
 			int count =(int) ((DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
-				+ ((URLNode)list.get(i)).getKey())).get(0));
+				+ currentKey )).get(0));
 
-			// Print out this URL with the number of its children
-			out.println("<a href='' onclick=\"return getAJAX(" + Integer.toString((int)((URLNode)list.get(i)).getKey() ) + ");\">" 
-				+ ((URLNode)list.get(i)).getUrl() + "</a> (" + Integer.toString(count) + ")<br />");
+			// Output JSON
+			out.println("{");
+			out.println("\"URL\": \"" + ((URLNode)list.get(i)).getUrl() + "\",");
+			out.println("\"count\": " + count + ",");
+			out.println("\"key\":" + currentKey );
+
+			// Include comma unless this is the last item of the array			
+			if (i < list.size() - 1)
+				out.println("},");
+			else
+				out.println("}");
 		}
+
+		out.println("]}");
 
 		// Don't close or we might close System.out!
 		out.flush();
