@@ -27,7 +27,7 @@ public class JCrawler
 	 * Crawl a URL and store it and its children in a database
 	 * Absolute URLs are assumed to be external to the site, relative
 	 * URLs are considered internal and are also crawled recursively
-	 * The binary tree bt assures that we do not crawl a URL more than once
+	 * The hashMap assures that we do not crawl a URL more than once
 	 * otherwise we will likely end up in an ifinite loop
 	 * 
 	 * @param hashMap A HashMap which stores the URLs that we have crawled during this recursion, in order to avoid re-crawling them
