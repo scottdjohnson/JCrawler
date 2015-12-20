@@ -11,9 +11,9 @@ import java.net.URISyntaxException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.HashMap;
 
 import scottdjohnson.binarytree.URLNode;
-import scottdjohnson.binarytree.BinaryTree;
 import scottdjohnson.database.DBConnector;
 
 /**
@@ -30,11 +30,11 @@ public class JCrawler
 	 * The binary tree bt assures that we do not crawl a URL more than once
 	 * otherwise we will likely end up in an ifinite loop
 	 * 
-	 * @param bt A binary tree which stores the URLs that we have crawled so far
+	 * @param hashMap A HashMap which stores the URLs that we have crawled during this recursion, in order to avoid re-crawling them
 	 * @param url The URL to crawl
 	 * @param parent The parent key in the database for this URL
 	 */
-	public static void crawlLinksFromUrl( BinaryTree bt, String url, long parent)
+        public static void crawlLinksFromUrl( HashMap<String,URLNode> hashMap, String url, long parent)
 	{		
 		try
 		{
@@ -54,15 +54,15 @@ public class JCrawler
 				URI u		= new URI(link.attr("href"));
 				
 				// if link is not already in tree, store it and recurse	
-				if ( !bt.isNodeInTree( un ) )
+				if ( !hashMap.containsKey( un.getUrl() ) )
 				{
-					bt.insertNode( un );
+					hashMap.put(un.getUrl(), un);
 					DBConnector.save( un );
 					System.out.println("Inserting URL: " + link.attr("href"));
 
 					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
-						crawlLinksFromUrl( bt, un.getUrl(), un.getKey() );
+						crawlLinksFromUrl( hashMap, un.getUrl(), un.getKey() );
 				}
 			}				
 		}
@@ -193,14 +193,14 @@ public class JCrawler
 	**/
 	public static void addUrl(String url)
 	{
-		BinaryTree bt = new BinaryTree();
-		URLNode un = new URLNode(url);
+		HashMap<String,URLNode> hashMap = new HashMap<String,URLNode>();
+		URLNode un 			= new URLNode(url);
 		DBConnector.open();
 
-		bt.insertNode(un);
+		hashMap.put(un.getUrl(),un);
 		DBConnector.save(un);
 		
-		JCrawler.crawlLinksFromUrl(bt, url, un.getKey());
+		JCrawler.crawlLinksFromUrl(hashMap, url, un.getKey());
 		DBConnector.close();
 	}
 }
