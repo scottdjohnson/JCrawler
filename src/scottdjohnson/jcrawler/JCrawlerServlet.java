@@ -25,6 +25,8 @@ import scottdjohnson.binarytree.BinaryTree;
 import scottdjohnson.jcrawler.JCrawler;
 import scottdjohnson.database.DBConnector;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * A servlet class for posting new URLs to crawl and getting URL crawl results form the database
  *
@@ -45,14 +47,19 @@ public class JCrawlerServlet extends HttpServlet
 	 * @param request The request to get from the servlet
 	 * @param response The response back from the servlet
 	 **/
+
+	private static final Logger logger = Logger.getLogger(JCrawlerServlet.class.getPackage().getName());
+
   	public void doGet(HttpServletRequest request, HttpServletResponse response)
     	 throws ServletException, IOException 
 	{
                 response.setContentType("application/json");
                 // This is necessary for AJAX requests to this function
                 response.setHeader("Access-Control-Allow-Origin","*");
-
-		JCrawler.getUrls(Integer.parseInt( request.getParameter("urlkey")), response.getWriter() );
+		
+		String urlKey = request.getParameter("urlkey");
+		logger.log(Level.INFO, "Getting key: " + urlKey);
+		JCrawler.getUrls(Integer.parseInt(urlKey), response.getWriter() );
 	}
 
 	/**
@@ -69,7 +76,10 @@ public class JCrawlerServlet extends HttpServlet
 		// This is necessary for AJAX requests to this function
 		response.setHeader("Access-Control-Allow-Origin","*");
 
-		JCrawler.addUrl( request.getParameter("crawl_url") );
+		String crawlURL = request.getParameter("crawl_url");
+		logger.log(Level.INFO, "Crawling URL: " + crawlURL);
+
+		JCrawler.addUrl( crawlURL );
 	}
 
         /**
@@ -86,6 +96,7 @@ public class JCrawlerServlet extends HttpServlet
                 // This is necessary for AJAX requests to this function
                 response.setHeader("Access-Control-Allow-Origin","*");
 
+		logger.log(Level.INFO, "Deleting URLs");
 		JCrawler.deleteAllUrls();
 	}	
 }
