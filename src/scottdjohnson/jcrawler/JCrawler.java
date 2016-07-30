@@ -191,7 +191,7 @@ public class JCrawler
 	*
 	* @param url The URL to crawl and store in the database
 	**/
-	public static void addUrl(String url)
+	public static long addUrl(String url)
 	{
 		HashMap<String,URLNode> hashMap = new HashMap<String,URLNode>();
 		URLNode un 			= new URLNode(url);
@@ -199,8 +199,11 @@ public class JCrawler
 
 		hashMap.put(un.getUrl(),un);
 		DBConnector.save(un);
-		
-		JCrawler.crawlLinksFromUrl(hashMap, url, un.getKey());
+
+		long key = un.getKey();		
+		JCrawler.crawlLinksFromUrl(hashMap, url, key);
 		DBConnector.close();
+
+		return key;
 	}
 }
