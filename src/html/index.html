@@ -34,10 +34,30 @@ function postAJAX()
 		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 	}
 	
-	xmlhttp.open("POST","./JCrawlerServlet",false);
+        xmlhttp.onreadystatechange = function()
+        {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                        var responseText = xmlhttp.responseText;
+                        var jsonParsed = JSON.parse(responseText);
+                        var urlOutput = "";
+
+                        for (var i = 0; i < jsonParsed.URLs.length; i++)
+                        {
+                                urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
+                                urlOutput += jsonParsed.URLs[i].URL + "<a/> (" + jsonParsed.URLs[i].count + ")<br />";
+                        }
+                        document.getElementById("urls").innerHTML = urlOutput;
+                }
+        };
+
+	xmlhttp.open("POST","./JCrawlerServlet", true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xmlhttp.send("crawl_url=" + document.getElementById('urlkey').value);
 
+	document.getElementById("urls").innerHTML = "Please wait, scanning URL: " + document.getElementById('urlkey').value;
+
+	return false;
 }
 
 function getAJAX( getKey)
@@ -84,7 +104,7 @@ function getAJAX( getKey)
 <a href="/">HOME</a><p/>
 <b>Crawl a URL</b><br />
 <input type="text" id="urlkey" value="http://" />
-<button type="button" onclick="postAJAX();getAJAX(0);">Submit</button>
+<button type="button" onclick="postAJAX();">Submit</button>
 <br />
 <button type="button" onclick="deleteAll();getAJAX(0);">Reset</button>
 <br />
