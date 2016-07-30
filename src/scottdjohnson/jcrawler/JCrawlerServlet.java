@@ -78,8 +78,10 @@ public class JCrawlerServlet extends HttpServlet
 
 		String crawlURL = request.getParameter("crawl_url");
 		logger.log(Level.INFO, "Crawling URL: " + crawlURL);
-
 		JCrawler.addUrl( crawlURL );
+
+		logger.log(Level.INFO, "Getting key: " + 0);
+		JCrawler.getUrls(new Integer(0), response.getWriter() );
 	}
 
         /**
