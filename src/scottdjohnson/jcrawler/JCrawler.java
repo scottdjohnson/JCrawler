@@ -13,6 +13,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashMap;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import scottdjohnson.node.URLNode;
 import scottdjohnson.database.DBConnector;
 
@@ -22,7 +25,8 @@ import scottdjohnson.database.DBConnector;
  * @author Scott Johnson
  **/
 public class JCrawler 
-{	
+{
+	private static final Logger logger = Logger.getLogger(JCrawler.class.getPackage().getName());	
 	/**
 	 * Crawl a URL and store it and its children in a database
 	 * Absolute URLs are assumed to be external to the site, relative
@@ -58,7 +62,7 @@ public class JCrawler
 				{
 					hashMap.put(un.getUrl(), un);
 					DBConnector.save( un );
-					System.out.println("Inserting URL: " + link.attr("href"));
+					logger.log(Level.INFO, "Inserting URL: " + link.attr("href"));
 
 					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
@@ -68,11 +72,11 @@ public class JCrawler
 		}
 		catch(URISyntaxException e)
 		{
-			System.out.println("This is not a valid URL");
+			logger.log(Level.WARNING, "This is not a valid URL; " + e.getMessage());
 		}
 		catch(IOException e)
 		{
-			System.out.println("Could not connect to this URL");
+			logger.log(Level.WARNING, "Could not connect to this URL; " + e.getMessage());
 
 		}
 
@@ -138,7 +142,7 @@ public class JCrawler
 		}
 		catch (Exception e)
 		{
-			System.out.println(e.getMessage());
+			logger.log(Level.WARNING, e.getMessage());
 		}
 
 		return list;
