@@ -20,8 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.IOException;
 
-import scottdjohnson.binarytree.URLNode;
-import scottdjohnson.binarytree.BinaryTree;
+import scottdjohnson.node.URLNode;
 import scottdjohnson.jcrawler.JCrawler;
 import scottdjohnson.database.DBConnector;
 
