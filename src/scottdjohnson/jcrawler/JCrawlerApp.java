@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStream;
 
-import scottdjohnson.binarytree.URLNode;
-import scottdjohnson.binarytree.BinaryTree;
+import scottdjohnson.node.URLNode;
 import scottdjohnson.jcrawler.JCrawler;
 import scottdjohnson.database.DBConnector;
 
@@ -41,13 +40,14 @@ public class JCrawlerApp
 	{
 		if (args.length > 0)
 		{
+//			JCrawler.deleteUrlAndChildren(Integer.parseInt(args[0]));
 			JCrawler.addUrl(args[0]);
 		}
 		else
 		{
 			JCrawler.getUrls(0, new PrintWriter((OutputStream)System.out));
-		System.out.println("next");
-			JCrawler.deleteAllUrls();
+//		System.out.println("next");
+//			JCrawler.deleteAllUrls();
 		}
 
 	}
