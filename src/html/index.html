@@ -5,35 +5,22 @@
 body { font-family: Arial; }
 </style>
 <script>
-
-function deleteAll()
+function constructXmlHttp()
 {
-        var xmlhttp;
         if (window.XMLHttpRequest)
         {
-                xmlhttp = new XMLHttpRequest();
+                return new XMLHttpRequest();
         }
         else
         {
-                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                return new ActiveXObject("Microsoft.XMLHTTP");
         }
-
-        xmlhttp.open("DELETE","./JCrawlerServlet",false);
-        xmlhttp.send();
 }
 
-function postAJAX()
+function getXmlHttp()
 {
-	var xmlhttp;
-	if (window.XMLHttpRequest)
- 	{
-		xmlhttp=new XMLHttpRequest();
-	}
-	else
-	{
-		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	
+	var xmlhttp = constructXmlHttp();
+
         xmlhttp.onreadystatechange = function()
         {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200)
@@ -41,7 +28,6 @@ function postAJAX()
                         var responseText = xmlhttp.responseText;
                         var jsonParsed = JSON.parse(responseText);
                         var urlOutput = "";
-
                         for (var i = 0; i < jsonParsed.URLs.length; i++)
                         {
                                 urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
@@ -50,6 +36,22 @@ function postAJAX()
                         document.getElementById("urls").innerHTML = urlOutput;
                 }
         };
+
+	return xmlhttp;
+}
+
+function deleteAll()
+{
+        var xmlhttp = constructXmlHttp();
+
+	document.getElementById("urls").innerHTML = "";
+        xmlhttp.open("DELETE","./JCrawlerServlet", false);
+        xmlhttp.send();
+}
+
+function postAJAX()
+{
+	var xmlhttp = getXmlHttp();
 
 	xmlhttp.open("POST","./JCrawlerServlet", true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -62,33 +64,7 @@ function postAJAX()
 
 function getAJAX( getKey)
 {
-        var xmlhttp;
-        if (window.XMLHttpRequest)
-        {
-                xmlhttp = new XMLHttpRequest();
-        }
-        else
-        {
-                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        
-        xmlhttp.onreadystatechange = function()
-        {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-			var responseText = xmlhttp.responseText;
-                        var jsonParsed = JSON.parse(responseText);
-			var urlOutput = "";
-
-			for (var i = 0; i < jsonParsed.URLs.length; i++)
-			{
-				urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
-				urlOutput += jsonParsed.URLs[i].URL + "<a/> (" + jsonParsed.URLs[i].count + ")<br />";
-			}
-
-			document.getElementById("urls").innerHTML = urlOutput;
-                }
-        }
+        var xmlhttp = getXmlHttp();
 
         xmlhttp.open("GET","./JCrawlerServlet?urlkey=" + getKey,true);
         xmlhttp.send();
