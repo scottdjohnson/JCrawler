@@ -199,14 +199,27 @@ public class JCrawler
 	{
 		HashMap<String,URLNode> hashMap = new HashMap<String,URLNode>();
 		URLNode un 			= new URLNode(url);
-		DBConnector.open();
+		long key			= 0; // Fail safe: return the top level item
 
-		hashMap.put(un.getUrl(),un);
-		DBConnector.save(un);
+		try
+		{
+			logger.log(Level.INFO, "Opening database connection...");
+			DBConnector.open();
 
-		long key = un.getKey();		
-		JCrawler.crawlLinksFromUrl(hashMap, url, key);
-		DBConnector.close();
+			logger.log(Level.INFO,"Putting URL into HashMap...");
+			hashMap.put(un.getUrl(),un);
+
+			logger.log(Level.INFO, "Saving URL: " + url);
+			DBConnector.save(un);
+
+			key = un.getKey();		
+			JCrawler.crawlLinksFromUrl(hashMap, url, key);
+			DBConnector.close();
+		}
+		catch (Exception e)
+		{
+			logger.log(Level.INFO, e.getMessage());
+		}
 
 		return key;
 	}
