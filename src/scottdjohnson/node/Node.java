@@ -3,13 +3,10 @@ package scottdjohnson.node;
 /**
  * A node in a binary tree
  *
- * By itself it is useless because it contains no data
- *
  * In theory, this implementation may allow left and right to mean anything,
  * in practice we expect that the right Nodes contain lesser values and the
  * left Nodes contain greater values
  *
- * @see BinaryTree
  *
  * @author Scott Johnson
  **/
