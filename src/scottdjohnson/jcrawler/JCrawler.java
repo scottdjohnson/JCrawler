@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashMap;
 
-import scottdjohnson.binarytree.URLNode;
+import scottdjohnson.node.URLNode;
 import scottdjohnson.database.DBConnector;
 
 /**
