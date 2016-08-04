@@ -79,7 +79,7 @@ public class JCrawlerServlet extends HttpServlet
 		logger.log(Level.INFO, "Crawling URL: " + crawlURL);
 		JCrawler.addUrl( crawlURL );
 
-		logger.log(Level.INFO, "Getting key: " + 0);
+		logger.log(Level.INFO, "Getting key: 0");
 		JCrawler.getUrls(new Integer(0), response.getWriter() );
 	}
 
@@ -99,6 +99,9 @@ public class JCrawlerServlet extends HttpServlet
 
 		logger.log(Level.INFO, "Deleting URLs");
 		JCrawler.deleteAllUrls();
+
+                logger.log(Level.INFO, "Getting key: 0");
+                JCrawler.getUrls(new Integer(0), response.getWriter() );
 	}	
 }
 
