@@ -6,6 +6,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Query;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * A final (static) class that can be used for connecting objects to the database via Hibernate
  *
@@ -15,8 +18,11 @@ import org.hibernate.Query;
 public class DBConnector
 {
 
-	private static org.hibernate.Session session = null;
-	private static  org.hibernate.Transaction tx = null;
+	private static org.hibernate.Session session 			= null;
+	private static org.hibernate.SessionFactory sessionFactory 	= null;
+	private static  org.hibernate.Transaction tx 			= null;
+
+	private static final Logger logger = Logger.getLogger(DBConnector.class.getPackage().getName());
 
 	/**
 	* Private constructor so the class cannot be constructed
@@ -34,8 +40,17 @@ public class DBConnector
 	{
 		if ( null == session || !session.isOpen())
                 {
-			session = new Configuration().configure().buildSessionFactory().openSession();
- 			tx = session.beginTransaction();
+			try
+			{
+				if (null == sessionFactory)
+					sessionFactory = new Configuration().configure().buildSessionFactory();
+				session = sessionFactory.openSession();
+	 			tx = session.beginTransaction();
+			}
+			catch(Exception e)
+			{
+				logger.log(Level.WARNING, e.getMessage());
+			}
 		}
 	}
 
