@@ -56,7 +56,8 @@ public class JCrawler
 				
 				URLNode un 	= new URLNode( link.attr("abs:href"), parent);
 				URI u		= new URI(link.attr("href"));
-				
+
+				logger.log(Level.INFO,"Getting link - name: " + link.text() + " url: " + link.attr("href"));				
 				// if link is not already in tree, store it and recurse	
 				if ( !hashMap.containsKey( un.getUrl() ) )
 				{
@@ -183,7 +184,16 @@ public class JCrawler
 				out.println("}");
 		}
 
-		out.println("]}");
+		out.println("]");
+
+		// This will fail if the database is reorganized to support multiple parents
+		List<URLNode> l = (DBConnector.getFromQuery("from URLNode url_list where url_key=" + urlKey ));
+		if (null != l && l.size() == 1)
+		{
+			int parentKey = (int)l.get(0).getParentKey();
+			out.println(",\n\"parent\": \"" + parentKey +  "\"");
+		}
+		out.println("}");
 
 		// Don't close or we might close System.out!
 		out.flush();
