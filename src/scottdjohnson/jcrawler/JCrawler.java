@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,11 +35,11 @@ public class JCrawler
 	 * The hashMap assures that we do not crawl a URL more than once
 	 * otherwise we will likely end up in an ifinite loop
 	 * 
-	 * @param hashMap A HashMap which stores the URLs that we have crawled during this recursion, in order to avoid re-crawling them
+	 * @param map A map which stores the URLs that we have crawled during this recursion, in order to avoid re-crawling them
 	 * @param url The URL to crawl
 	 * @param parent The parent key in the database for this URL
 	 */
-        public static void crawlLinksFromUrl( HashMap<String,URLNode> hashMap, String url, long parent)
+        public static void crawlLinksFromUrl( Map<String,URLNode> map, String url, long parent)
 	{		
 		try
 		{
@@ -59,15 +60,15 @@ public class JCrawler
 
 				logger.log(Level.INFO,"Getting link - name: " + link.text() + " url: " + link.attr("href"));				
 				// if link is not already in tree, store it and recurse	
-				if ( !hashMap.containsKey( un.getUrl() ) )
+				if ( !map.containsKey( un.getUrl() ) )
 				{
-					hashMap.put(un.getUrl(), un);
+					map.put(un.getUrl(), un);
 					DBConnector.save( un );
 					logger.log(Level.INFO, "Inserting URL: " + link.attr("href"));
 
 					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
-						crawlLinksFromUrl( hashMap, un.getUrl(), un.getKey() );
+						crawlLinksFromUrl( map, un.getUrl(), un.getKey() );
 				}
 			}				
 		}
@@ -114,12 +115,12 @@ public class JCrawler
 	public static void deleteUrlAndChildrenRecurse(Integer urlKey)
 	{
                 // Get list of children with this as parent
-                List list = getChildren(urlKey);
+                List<URLNode> list = getChildren(urlKey);
 
                 // Recurse on children
                 if (null != list)
                         for (int i = 0; i < list.size(); i++)
-                                deleteUrlAndChildrenRecurse( (int)((URLNode)list.get(i)).getKey() );
+                                deleteUrlAndChildrenRecurse( (int)(list.get(i)).getKey() );
 
                 DBConnector.deleteFromQuery("from URLNode url_list where url_key=" + urlKey);
 	}
@@ -159,13 +160,13 @@ public class JCrawler
 	{
 		DBConnector.open();
 
-		List list = getChildren(urlKey);
+		List<URLNode> list = getChildren(urlKey);
 		out.println("{\"URLs\":[");
 
 		// Loop through all the results from the query
 		for (int i = 0; i < list.size(); i++)
 		{
-			int currentKey = (int)((URLNode)list.get(i)).getKey();
+			int currentKey = (int)(list.get(i)).getKey();
 
 			// Count the total number of results that have this URL as a parent
 			int count =(int) ((DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
@@ -173,7 +174,7 @@ public class JCrawler
 
 			// Output JSON
 			out.println("{");
-			out.println("\"URL\": \"" + ((URLNode)list.get(i)).getUrl() + "\",");
+			out.println("\"URL\": \"" + (list.get(i)).getUrl() + "\",");
 			out.println("\"count\": " + count + ",");
 			out.println("\"key\":" + currentKey );
 
@@ -207,7 +208,7 @@ public class JCrawler
 	**/
 	public static long addUrl(String url)
 	{
-		HashMap<String,URLNode> hashMap = new HashMap<String,URLNode>();
+		Map<String,URLNode> map = new HashMap<String,URLNode>();
 		URLNode un 			= new URLNode(url);
 		long key			= 0; // Fail safe: return the top level item
 
@@ -216,14 +217,14 @@ public class JCrawler
 			logger.log(Level.INFO, "Opening database connection...");
 			DBConnector.open();
 
-			logger.log(Level.INFO,"Putting URL into HashMap...");
-			hashMap.put(un.getUrl(),un);
+			logger.log(Level.INFO,"Putting URL into Map...");
+			map.put(un.getUrl(),un);
 
 			logger.log(Level.INFO, "Saving URL: " + url);
 			DBConnector.save(un);
 
 			key = un.getKey();		
-			JCrawler.crawlLinksFromUrl(hashMap, url, key);
+			JCrawler.crawlLinksFromUrl(map, url, key);
 			DBConnector.close();
 		}
 		catch (Exception e)
