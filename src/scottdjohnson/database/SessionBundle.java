@@ -15,6 +15,12 @@ public class SessionBundle
 	
 	private static final Logger logger = Logger.getLogger(SessionBundle.class.getPackage().getName());
 
+	public SessionBundle (Session s, Transaction t)
+	{
+		session = s;
+		tx = t;
+	}
+
 	/**
 	* Save this object in the database using a Hibernate session
 	* @param o The object to save
