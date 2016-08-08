@@ -18,7 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import scottdjohnson.node.URLNode;
-import scottdjohnson.database.DBConnector;
+import scottdjohnson.database.SessionBundle;
+import scottdjohnson.database.SessionBundleFactory;
 
 /**
  * JCrawler provides the basic functionlity for crawling a Web URL.
@@ -39,7 +40,7 @@ public class JCrawler
 	 * @param url The URL to crawl
 	 * @param parent The parent key in the database for this URL
 	 */
-        public static void crawlLinksFromUrl( Map<String,URLNode> map, String url, long parent)
+        public static void crawlLinksFromUrl( Map<String,URLNode> map, String url, long parent, SessionBundle sb)
 	{		
 		try
 		{
@@ -63,12 +64,12 @@ public class JCrawler
 				if ( !map.containsKey( un.getUrl() ) )
 				{
 					map.put(un.getUrl(), un);
-					DBConnector.save( un );
+					sb.save( un);
 					logger.log(Level.INFO, "Inserting URL: " + link.attr("href"));
 
 					// Don't recurse absolute URLs, assume they are external
 					if (!u.isAbsolute())
-						crawlLinksFromUrl( map, un.getUrl(), un.getKey() );
+						crawlLinksFromUrl( map, un.getUrl(), un.getKey(), sb );
 				}
 			}				
 		}
@@ -90,9 +91,9 @@ public class JCrawler
 	**/
 	public static void deleteAllUrls()
 	{
-		DBConnector.open();
-		DBConnector.deleteFromQuery("from URLNode url_list");
-		DBConnector.close();
+		SessionBundle sb = SessionBundleFactory.getNewSession();
+		sb.deleteFromQuery("from URLNode url_list");
+		sb.close();
 	}
 
 	/**
@@ -100,18 +101,20 @@ public class JCrawler
 	*
 	* @param urlKey The key of the URL to delete
 	**/
+/*
 	public static void deleteUrlAndChildren(Integer urlKey)
 	{
-                DBConnector.open();
+		DBConnector.open();
 		deleteUrlAndChildrenRecurse(urlKey);
                 DBConnector.close();
 	}
-
+*/
         /**
         * Recursing function to delete a URL and its children
         *
         * @param urlKey The key of the URL to delete
         **/
+/*
 	public static void deleteUrlAndChildrenRecurse(Integer urlKey)
 	{
                 // Get list of children with this as parent
@@ -124,13 +127,13 @@ public class JCrawler
 
                 DBConnector.deleteFromQuery("from URLNode url_list where url_key=" + urlKey);
 	}
-
+*/
 	/**
 	* Get all objects with this as the parent. Expects DBConnector to already be open
 	* 
 	* @param urlKey The key whose children this function returns
 	**/
-	public static List getChildren(Integer urlKey)
+	public static List getChildren(Integer urlKey, SessionBundle sb)
 	{
 		List list = null;
 
@@ -138,9 +141,9 @@ public class JCrawler
 		{
                 	// If there is a specifc key, get it, otherwise get all of them
                 	if (null != urlKey)
-                	        list = DBConnector.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
+                	        list = sb.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
                 	else
-                	        list = DBConnector.getFromQuery("from URLNode url_list where parent_key = 0");
+                	        list = sb.getFromQuery("from URLNode url_list where parent_key = 0");
 		}
 		catch (Exception e)
 		{
@@ -158,9 +161,11 @@ public class JCrawler
 	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
-		DBConnector.open();
+		SessionBundle sb = SessionBundleFactory.getNewSession();
 
-		List<URLNode> list = getChildren(urlKey);
+		logger.log(Level.INFO, "SessionBundle created.");
+
+		List<URLNode> list = getChildren(urlKey, sb);
 		out.println("{\"URLs\":[");
 
 		// Loop through all the results from the query
@@ -169,8 +174,9 @@ public class JCrawler
 			int currentKey = (int)(list.get(i)).getKey();
 
 			// Count the total number of results that have this URL as a parent
-			int count =(int) ((DBConnector.getFromQuery("select count(*) from URLNode where parent_key="
+			int count =(int) ((sb.getFromQuery("select count(*) from URLNode where parent_key="
 				+ currentKey )).get(0));
+			logger.log(Level.INFO, "Count query retrieved.");
 
 			// Output JSON
 			out.println("{");
@@ -188,7 +194,7 @@ public class JCrawler
 		out.println("]");
 
 		// This will fail if the database is reorganized to support multiple parents
-		List<URLNode> l = (DBConnector.getFromQuery("from URLNode url_list where url_key=" + urlKey ));
+		List<URLNode> l = (sb.getFromQuery("from URLNode url_list where url_key=" + urlKey));
 		if (null != l && l.size() == 1)
 		{
 			int parentKey = (int)l.get(0).getParentKey();
@@ -198,7 +204,7 @@ public class JCrawler
 
 		// Don't close or we might close System.out!
 		out.flush();
-		DBConnector.close();		
+		sb.close();
 	}
 
 	/**
@@ -215,17 +221,17 @@ public class JCrawler
 		try
 		{
 			logger.log(Level.INFO, "Opening database connection...");
-			DBConnector.open();
+			SessionBundle sb = SessionBundleFactory.getNewSession();
 
 			logger.log(Level.INFO,"Putting URL into Map...");
 			map.put(un.getUrl(),un);
 
 			logger.log(Level.INFO, "Saving URL: " + url);
-			DBConnector.save(un);
+			sb.save(un);
 
 			key = un.getKey();		
-			JCrawler.crawlLinksFromUrl(map, url, key);
-			DBConnector.close();
+			JCrawler.crawlLinksFromUrl(map, url, key, sb);
+			sb.close();
 		}
 		catch (Exception e)
 		{
