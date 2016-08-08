@@ -1,7 +1,6 @@
 package scottdjohnson.node;
 
 import scottdjohnson.node.Node;
-import scottdjohnson.database.DBConnector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
