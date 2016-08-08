@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import scottdjohnson.node.URLNode;
 import scottdjohnson.jcrawler.JCrawler;
-import scottdjohnson.database.DBConnector;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
