@@ -14,7 +14,6 @@ import java.io.OutputStream;
 
 import scottdjohnson.node.URLNode;
 import scottdjohnson.jcrawler.JCrawler;
-import scottdjohnson.database.DBConnector;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Query;
@@ -38,6 +37,8 @@ public class JCrawlerApp
 	 */
 	public static void main(String[] args)
 	{
+		try
+		{
 		if (args.length > 0)
 		{
 //			JCrawler.deleteUrlAndChildren(Integer.parseInt(args[0]));
@@ -46,9 +47,16 @@ public class JCrawlerApp
 		else
 		{
 			JCrawler.getUrls(0, new PrintWriter((OutputStream)System.out));
+			System.out.println("next");
+			JCrawler.getUrls(1, new PrintWriter((OutputStream)System.out));
 //		System.out.println("next");
 //			JCrawler.deleteAllUrls();
 		}
-
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }
