@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,13 +47,10 @@ public class JCrawler
 		{
 			Document doc 	= Jsoup.connect(url).get();
 			Elements links 	= doc.select("a[href]");
-			int size	= links.size();
 		
 			// First we store all the URLs at the current level
-			for (int i = 0; i < size; i++)
+			for (Element link : links)
 			{
-				Element link = links.get(i);
-				
 				// We are going to assume that an absolute URL points to an external
 				//	external web site. Not an entirely safe assumption but ok for this demo
 				
@@ -166,12 +164,15 @@ public class JCrawler
 		logger.log(Level.INFO, "SessionBundle created.");
 
 		List<URLNode> list = getChildren(urlKey, sb);
+		Iterator<URLNode> iterator = list.iterator();
+
 		out.println("{\"URLs\":[");
 
 		// Loop through all the results from the query
-		for (int i = 0; i < list.size(); i++)
+		while (iterator.hasNext())
 		{
-			int currentKey = (int)(list.get(i)).getKey();
+			URLNode urlNode = iterator.next();
+			int currentKey = (int)urlNode.getKey();
 
 			// Count the total number of results that have this URL as a parent
 			int count =(int) ((sb.getFromQuery("select count(*) from URLNode where parent_key="
@@ -180,12 +181,12 @@ public class JCrawler
 
 			// Output JSON
 			out.println("{");
-			out.println("\"URL\": \"" + (list.get(i)).getUrl() + "\",");
+			out.println("\"URL\": \"" + urlNode.getUrl() + "\",");
 			out.println("\"count\": " + count + ",");
 			out.println("\"key\":" + currentKey );
 
 			// Include comma unless this is the last item of the array			
-			if (i < list.size() - 1)
+			if(iterator.hasNext())
 				out.println("},");
 			else
 				out.println("}");
