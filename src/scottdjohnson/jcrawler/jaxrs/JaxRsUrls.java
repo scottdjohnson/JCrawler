@@ -14,13 +14,23 @@ import scottdjohnson.jcrawler.JCrawler;
 @Path("/urls/{key}")
 public class JaxRsUrls {
 
+	/**
+	* Return the HTML value for /urls/{key}, for the given key
+	* @param key The key entered on the URL at /url/{key}
+	* @return The String to display on the HTML page
+	**/
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public String gwetHtml(@PathParam("key") String key) 
+	public String getHtml(@PathParam("key") String key) 
 	{
 		return getString(key);
 	}
 
+        /**
+        * Return the JSON value for /urls/{key}, for the given key
+        * @param key The key entered on the URL at /url/{key}
+        * @return The String of JSON returned to the caller
+        **/
         @GET
         @Produces(MediaType.APPLICATION_JSON)
         public String getJson(@PathParam("key") String key)
@@ -28,6 +38,12 @@ public class JaxRsUrls {
                 return getString(key);
         }
 
+
+        /**
+        * Produce the String value to return for the JAX-RS GET commands
+        * @param key The key entered on the URL at /url/{key}, passed from the GET methods
+        * @return The String of JSON produced by looking up URL children of this key
+        **/
 	private String getString(String key)
 	{
 		StringWriter stringWriter = new StringWriter();
