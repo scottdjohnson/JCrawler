@@ -13,6 +13,10 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.LinkedList;
 import java.util.Iterator;
 
 import java.util.logging.Level;
@@ -37,50 +41,56 @@ public class JCrawler
 	 * The hashMap assures that we do not crawl a URL more than once
 	 * otherwise we will likely end up in an ifinite loop
 	 * 
-	 * @param map A map which stores the URLs that we have crawled during this recursion, in order to avoid re-crawling them
-	 * @param url The URL to crawl
-	 * @param parent The parent key in the database for this URL
+	 * @param uq The queue for holding the scanned URLs, to assure that they are scanned in order and only once per URL
+	 * @param sb The session bundle for saving URLs to the database
 	 */
-        public static void crawlLinksFromUrl( Map<String,URLNode> map, String url, long parent, SessionBundle sb)
+        public static void crawlLinksFromUrl( UniqueMemQueue<URLNode,String> uq, SessionBundle sb)
 	{		
-		try
+		// While the queue is not empty, grab the head of the queue, check its children and add them to the end
+		// of the queue for later processing in the loop
+		// This produces a breadth-first-search, which provides better results when displaying the scanned URLs
+		while(!uq.isEmpty())
 		{
-			Document doc 	= Jsoup.connect(url).get();
-			Elements links 	= doc.select("a[href]");
-		
-			// First we store all the URLs at the current level
-			for (Element link : links)
-			{
-				// We are going to assume that an absolute URL points to an external
-				//	external web site. Not an entirely safe assumption but ok for this demo
-				
-				URLNode un 	= new URLNode( link.attr("abs:href"), parent);
-				URI u		= new URI(link.attr("href"));
 
-				logger.log(Level.INFO,"Getting link - name: " + link.text() + " url: " + link.attr("href"));				
-				// if link is not already in tree, store it and recurse	
-				if ( !map.containsKey( un.getUrl() ) )
+			try {
+				// Get the URL at the head of the queue
+				URLNode unParent 	= uq.remove();
+				Document doc    	= Jsoup.connect(unParent.getUrl()).get();
+				Elements links  	= doc.select("a[href]");
+				doc = null;
+
+				// Look at each URL within the HTML page produced by the current URL
+				for (Element link : links)
 				{
-					map.put(un.getUrl(), un);
-					sb.save( un);
-					logger.log(Level.INFO, "Inserting URL: " + link.attr("href"));
+					String strLink = link.attr("abs:href");
+					URI u           = new URI(link.attr("href"));
 
-					// Don't recurse absolute URLs, assume they are external
-					if (!u.isAbsolute())
-						crawlLinksFromUrl( map, un.getUrl(), un.getKey(), sb );
+					// If the value is not new to the queue, and not absolute, add it
+					// We currently ignore absolute URLs assuming they are external
+					if(!uq.containsValue(strLink) && !u.isAbsolute())
+					{
+						URLNode un = new URLNode(strLink, unParent.getKey());
+
+						logger.log(Level.INFO, "Adding URL: " + un.getUrl());
+						sb.save(un);
+
+						// Add this URL to the queue, process later in the loop
+						uq.add(un, un.getUrl());
+					}
 				}
-			}				
-		}
-		catch(URISyntaxException e)
-		{
-			logger.log(Level.WARNING, "This is not a valid URL; " + e.getMessage());
-		}
-		catch(IOException e)
-		{
-			logger.log(Level.WARNING, "Could not connect to this URL; " + e.getMessage());
 
-		}
+				logger.log(Level.INFO, "Queue size: " + uq.size());
 
+			}
+			catch(IOException e)
+			{
+				logger.log(Level.WARNING, "Could not connect to this URL; " + e.getMessage());
+			}
+			catch(URISyntaxException e)
+			{
+				logger.log(Level.WARNING, "This is not a valid URL; " + e.getMessage());
+			}
+		}
 	}
 
 	/**
@@ -215,7 +225,8 @@ public class JCrawler
 	**/
 	public static long addUrl(String url)
 	{
-		Map<String,URLNode> map = new HashMap<String,URLNode>();
+		UniqueMemQueue<URLNode,String> uq 	= new UniqueMemQueue<URLNode,String>();
+
 		URLNode un 			= new URLNode(url);
 		long key			= 0; // Fail safe: return the top level item
 
@@ -225,13 +236,13 @@ public class JCrawler
 			SessionBundle sb = SessionBundleFactory.getNewSession();
 
 			logger.log(Level.INFO,"Putting URL into Map...");
-			map.put(un.getUrl(),un);
+			uq.add(un, un.getUrl());
 
 			logger.log(Level.INFO, "Saving URL: " + url);
 			sb.save(un);
 
-			key = un.getKey();		
-			JCrawler.crawlLinksFromUrl(map, url, key, sb);
+			key = un.getKey();
+			JCrawler.crawlLinksFromUrl(uq, sb);
 			sb.close();
 		}
 		catch (Exception e)
@@ -241,4 +252,82 @@ public class JCrawler
 
 		return key;
 	}
+
+	/**
+	*	Queue that does not allow the same item to be requeued after it has been queued up once.
+	*	The generic values E and V represent elements and values. The element is the basic object type to be stored, while the value
+	*	should be a smaller object, like a String, to minimize memory overhead. The V value is used to determine the uniqueness
+	*	of the object being added to the Queue.
+	**/
+	private static class UniqueMemQueue<E,V>
+	{
+		Set<V> set;
+		Queue<E> que;
+
+		/**
+		* Constructor, private to assure only this class can construct it
+		**/
+		private UniqueMemQueue()
+		{
+			set = new HashSet<V>();
+			que = new LinkedList<E>();
+		}
+
+		/**
+		* Add the object to the queue
+		*
+		* @param e The object to add to the queue
+		* @param v The value to check for uniquenes. If this value has been previously added, e will not be added.
+		* @return true if the operation succeeds, otherwise false.
+		**/
+		public boolean add(E e, V v)
+		{
+			if (!set.contains(v))
+			{
+				que.add(e);
+				set.add(v);
+			}
+
+			return true;
+		}
+
+		/**
+		* Remove the object at the head of the queue and return it.
+		* @return The object from the head of the queue.
+		**/
+		public E remove()
+		{
+			return que.remove();
+		}
+
+		/**
+		* Determine whether the queue is currently empty
+		* @return true if empty, otherwise false
+		**/
+		public boolean isEmpty()
+		{
+			return que.isEmpty();
+		}
+
+		/**
+		* Determine whether the queue has ever contained the value v
+		* @param v The value to determine whether the object has been passed into the queue previously
+		* @return true if the value has been contained in the queue, otherwise false.
+		**/
+		public boolean containsValue(V v)
+		{
+			return set.contains(v);
+		}
+
+		/**
+		* The current size of the queue of objects still held in the queue.
+		* @return The number of objects currently in the queue.
+		**/
+		public int size()
+		{
+			return que.size();
+		}
+	}
+
+
 }
