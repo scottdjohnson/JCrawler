@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.Date;
+import java.sql.Timestamp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,14 +64,15 @@ public class JCrawler
 				// Look at each URL within the HTML page produced by the current URL
 				for (Element link : links)
 				{
-					String strLink = link.attr("abs:href");
-					URI u           = new URI(link.attr("href"));
+					String strLink 		= link.attr("abs:href");
+					String strLinkName 	= link.text();
+					URI u           	= new URI(link.attr("href"));
 
 					// If the value is not new to the queue, and not absolute, add it
 					// We currently ignore absolute URLs assuming they are external
 					if(!uq.containsValue(strLink) && !u.isAbsolute())
 					{
-						URLNode un = new URLNode(strLink, unParent.getKey());
+						URLNode un = new URLNode(strLink, strLinkName, new Timestamp(new Date().getTime()), unParent.getKey());
 
 						logger.log(Level.INFO, "Adding URL: " + un.getUrl());
 						sb.save(un);
@@ -192,6 +195,8 @@ public class JCrawler
 			// Output JSON
 			out.println("{");
 			out.println("\"URL\": \"" + urlNode.getUrl() + "\",");
+			out.println("\"name\": \"" + urlNode.getName() + "\",");
+			out.println("\"timeCrawled\": \"" + urlNode.getTimeCrawled().toString() + "\",");
 			out.println("\"count\": " + count + ",");
 			out.println("\"key\":" + currentKey );
 
@@ -227,8 +232,8 @@ public class JCrawler
 	{
 		UniqueMemQueue<URLNode,String> uq 	= new UniqueMemQueue<URLNode,String>();
 
-		URLNode un 			= new URLNode(url);
-		long key			= 0; // Fail safe: return the top level item
+		long key                        = 0; // Fail safe: return the top level item
+		URLNode un 			= new URLNode(url, url, new Timestamp(new Date().getTime()), key);
 
 		try
 		{
