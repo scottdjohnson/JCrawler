@@ -8,9 +8,11 @@
 			<generator class="increment"/>
 		</id>
 
-	  <property name="ParentKey" column="parent_key" type="long" />
-
-	  <property name="Url" column="url" type="string" />
+	<property name="ParentKey" column="parent_key" type="long" />
+	<property name="Url" column="url" type="string" />
+	<property name="Name" column="link_name" type="string" />
+	<property name="TimeCrawled" column="time_crawled" type="timestamp" />
+	
 
    </class>
 
