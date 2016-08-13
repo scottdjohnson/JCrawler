@@ -1,6 +1,9 @@
 package scottdjohnson.node;
 
 import scottdjohnson.node.Node;
+
+import java.util.Date;
+import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,8 +16,11 @@ import java.util.logging.Logger;
 public class URLNode extends Node
 {
 	String url;
+	String name;
+	Timestamp timeCrawled;
 	private long key;
 	private long parentKey;
+
 	private static final Logger logger = Logger.getLogger(URLNode.class.getPackage().getName());
 
 	/**
@@ -24,6 +30,8 @@ public class URLNode extends Node
 	{
 		super();
 		setUrl("");
+		setName("");
+		setTimeCrawled(new Timestamp(new Date().getTime()));
 		parentKey = 0;
 	}
 
@@ -41,7 +49,7 @@ public class URLNode extends Node
 	}
 
 	/**
-	 * Constructor defining the URL and hte parent
+	 * Constructor defining the URL and the parent
 	 *
 	 * @param s the URL
 	 * @param parentKey the parent key (from the database) of this URL
@@ -49,6 +57,22 @@ public class URLNode extends Node
 	public URLNode( String s, long parentKey )
 	{
 		this(s);
+		this.parentKey = parentKey;
+	}
+
+	/**
+	 * Constructor defining the URL and all fields
+	 *
+	 * @param s the URL
+	 * @param n the name of the link
+	 * @param t the date and time this URL was crawled
+	 * @param parentKey the parent key (from the database) of this URL
+	 **/
+	public URLNode( String s, String n, Timestamp t, long parentKey )
+	{
+		this(s);
+		this.name = n;
+		this.timeCrawled = t;
 		this.parentKey = parentKey;
 	}
 	
@@ -127,6 +151,51 @@ public class URLNode extends Node
 			url = "";
 		else
 			url = s;
+	}
+
+	/**
+	 * Get the link name of this URLNode
+	 *
+	 * @return the link name
+	 **/
+	public String getName()
+	{
+		return name;
+	}
+	
+	/**
+	 * Set the link name of this URLNode
+	 * Private because it should only be used internally at this point
+	 *
+	 * @params s The link name to set this to
+	 **/
+	private void setName( String n )
+	{
+		if ( null == n)
+			name = "";
+		else
+			name = n;
+	}
+
+	/**
+	 * Get the time this URL was cralwed
+	 *
+	 * @return the date and time of the crawl
+	 **/
+	public Timestamp getTimeCrawled()
+	{
+		return timeCrawled;
+	}
+	
+	/**
+	 * Set the time that this URL was crawled
+	 * Private because it should only be used internally at this point
+	 *
+	 * @params t The date and time this URL was crawled
+	 **/
+	private void setTimeCrawled( Timestamp t )
+	{
+		timeCrawled = t;
 	}
 
 	/**
