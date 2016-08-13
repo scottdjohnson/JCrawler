@@ -34,17 +34,20 @@ create database jcrawler;
 
 use jcrawler;
 
-create table url_list (
+	create table url_list (
 
 	url_key int not null auto_increment, 
 
 	url text,
 
+	link_name text,
+
 	parent_key int,
 
-	primary key (url_key)
+	time_crawled datetime,
 
-);
+	primary key (url_key)
+	);
 
 Servlet
 ========
@@ -53,3 +56,10 @@ To run this as a servlet:
 
 	ant
 	deploy dist/JCrawler.war to your Tomcat webapps directory
+
+JUnit
+========
+
+	Download the latest from junit.org
+	export JUNIT_HOME=/path/to/junit.jar
+
