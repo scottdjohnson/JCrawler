@@ -28,13 +28,15 @@ function getXmlHttp()
                         var responseText = xmlhttp.responseText;
                         var jsonParsed = JSON.parse(responseText);
                         var urlOutput = "";
+
+			if (null != jsonParsed.parent)
+                                urlOutput += "<p><a href='' onclick=\"return getAJAX(" + jsonParsed.parent + ");\">&lt;&lt; back</a></p>";
                         for (var i = 0; i < jsonParsed.URLs.length; i++)
                         {
                                 urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
                                 urlOutput += jsonParsed.URLs[i].URL + "</a> (" + jsonParsed.URLs[i].count + ")<br />";
                         }
-
-			if (jsonParsed.parent)
+			if (null != jsonParsed.parent)
 				urlOutput += "<p><a href='' onclick=\"return getAJAX(" + jsonParsed.parent + ");\">&lt;&lt; back</a></p>";
 
                         document.getElementById("urls").innerHTML = urlOutput;
