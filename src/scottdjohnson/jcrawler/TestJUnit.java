@@ -63,7 +63,7 @@ public class TestJUnit {
 		assertEquals(0, jsonArray.getJsonObject(8).getInt("count"));
 		assertEquals(2, jsonArray.getJsonObject(9).getInt("count"));
 		assertEquals(0, jsonArray.getJsonObject(10).getInt("count"));
-//		assertEquals(0, json.getInt("parent"));
+		assertEquals(0, json.getInt("parent"));
 	}
 
 	@Test
