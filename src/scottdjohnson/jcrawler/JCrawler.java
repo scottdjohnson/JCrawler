@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.Date;
 import java.sql.Timestamp;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -195,7 +197,7 @@ public class JCrawler
 			// Output JSON
 			out.println("{");
 			out.println("\"URL\": \"" + urlNode.getUrl() + "\",");
-			out.println("\"name\": \"" + urlNode.getName() + "\",");
+			out.println("\"name\": \"" + StringEscapeUtils.escapeJson(urlNode.getName()) + "\",");
 			out.println("\"timeCrawled\": \"" + urlNode.getTimeCrawled().toString() + "\",");
 			out.println("\"count\": " + count + ",");
 			out.println("\"key\":" + currentKey );
@@ -214,8 +216,9 @@ public class JCrawler
 		if (null != l && l.size() == 1)
 		{
 			int parentKey = (int)l.get(0).getParentKey();
-			out.println(",\n\"parent\": \"" + parentKey +  "\"");
+			out.println(",\n\"parent\": " + parentKey);
 		}
+
 		out.println("}");
 
 		// Don't close or we might close System.out!
