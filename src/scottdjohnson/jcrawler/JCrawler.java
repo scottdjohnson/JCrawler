@@ -21,6 +21,11 @@ import java.util.Iterator;
 import java.util.Date;
 import java.sql.Timestamp;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonArrayBuilder;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.logging.Level;
@@ -181,7 +186,8 @@ public class JCrawler
 		List<URLNode> list = getChildren(urlKey, sb);
 		Iterator<URLNode> iterator = list.iterator();
 
-		out.println("{\"URLs\":[");
+		JsonObjectBuilder jsonBuilder 		= Json.createObjectBuilder();
+		JsonArrayBuilder jsonArrayBuilder 	= Json.createArrayBuilder();
 
 		// Loop through all the results from the query
 		while (iterator.hasNext())
@@ -194,32 +200,29 @@ public class JCrawler
 				+ currentKey )).get(0));
 			logger.log(Level.INFO, "Count query retrieved.");
 
-			// Output JSON
-			out.println("{");
-			out.println("\"URL\": \"" + urlNode.getUrl() + "\",");
-			out.println("\"name\": \"" + StringEscapeUtils.escapeJson(urlNode.getName()) + "\",");
-			out.println("\"timeCrawled\": \"" + urlNode.getTimeCrawled().toString() + "\",");
-			out.println("\"count\": " + count + ",");
-			out.println("\"key\":" + currentKey );
+			JsonObjectBuilder jsonArrayItem = Json.createObjectBuilder();
+			jsonArrayItem.add("URL", urlNode.getUrl());
+			jsonArrayItem.add("name", StringEscapeUtils.escapeJson(urlNode.getName()));
+			jsonArrayItem.add("timeCrawled", urlNode.getTimeCrawled().toString());
+			jsonArrayItem.add("count", count);
+			jsonArrayItem.add("key", currentKey );
 
-			// Include comma unless this is the last item of the array			
-			if(iterator.hasNext())
-				out.println("},");
-			else
-				out.println("}");
+			jsonArrayBuilder.add(jsonArrayItem.build());
 		}
 
-		out.println("]");
+		jsonBuilder.add("URLs", jsonArrayBuilder.build());
 
 		// This will fail if the database is reorganized to support multiple parents
 		List<URLNode> l = (sb.getFromQuery("from URLNode url_list where url_key=" + urlKey));
 		if (null != l && l.size() == 1)
 		{
 			int parentKey = (int)l.get(0).getParentKey();
-			out.println(",\n\"parent\": " + parentKey);
+			jsonBuilder.add("parent", parentKey);
 		}
 
-		out.println("}");
+		JsonObject json = jsonBuilder.build();
+		logger.log(Level.INFO, "JSON from JsonBuilder: " + json);
+		out.println(json);
 
 		// Don't close or we might close System.out!
 		out.flush();
