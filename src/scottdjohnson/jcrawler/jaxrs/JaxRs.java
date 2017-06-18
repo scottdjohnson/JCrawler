@@ -7,9 +7,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import java.io.Writer;
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+import java.io.IOException;
+import javax.ws.rs.WebApplicationException;
 
 import scottdjohnson.jcrawler.JCrawler;
 
@@ -28,19 +36,19 @@ public class JaxRs {
 	**/
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String postUrl(@FormParam("crawl_url") String crawlUrl) 
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response postUrl(@FormParam("crawl_url") String crawlUrl) 
 	{
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter);
+                StringWriter stringWriter = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(stringWriter);
 
 		logger.log(Level.INFO, "Crawling URL: " + crawlUrl);
-		JCrawler.addUrl( crawlUrl );
+		JCrawler.addUrl( crawlUrl);
 
 		logger.log(Level.INFO, "Getting key: 0");
-		JCrawler.getUrls(new Integer(0), printWriter );
+		JCrawler.getUrls(new Integer(0), stringWriter );
 
-		return stringWriter.toString();
+		return Response.ok(stringWriter.toString()).build();
 	}
 
         /**
@@ -50,7 +58,7 @@ public class JaxRs {
         **/
         @DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-        public String deleteAll()
+        public Response deleteAll()
         {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -64,6 +72,6 @@ public class JaxRs {
 		logger.log(Level.INFO, "Getting key: 0");
 		JCrawler.getUrls(new Integer(0), printWriter );
 
-		return stringWriter.toString();
+		return Response.ok(stringWriter.toString()).build();
        }
 }
