@@ -46,7 +46,7 @@ public class JaxRs {
 		JCrawler.addUrl( crawlUrl);
 
 		logger.log(Level.INFO, "Getting key: 0");
-		JCrawler.getUrls(new Integer(0), stringWriter );
+		JCrawler.getUrls(new Integer(0), printWriter );
 
 		return Response.ok(stringWriter.toString()).build();
 	}
