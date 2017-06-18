@@ -13,15 +13,16 @@
         <property name="build.dir" value="build"/>
         <property name="classes.dir" value="build/classes"/>
 
-	<property name="tomcat.deploy.dir" value="/var/lib/tomcat7/webapps"/>
-        <property name="tomcat.home" value="/usr/share/tomcat7/"/>
+        <property name="catalina.home" value="/usr/share/tomcat8/"/>
+	<property name="tomcat.deploy.dir" value="/var/lib/tomcat8/webapps"/>
+        <property name="tomcat.home" value="/usr/share/tomcat8/"/>
 
 	<path id="JCrawlerDependencies.classpath">
 		<pathelement location="./lib/hibernate3.jar"/>
 		<pathelement location="./lib/jsoup-1.7.2.jar"/>
 		<pathelement location="./lib/mail.jar"/>
 		<pathelement location="./lib/commons-lang3-3.4.jar"/>
-		<pathelement location="${env.CATALINA_HOME}/lib/servlet-api.jar" />
+		<pathelement location="${catalina.home}/lib/servlet-api.jar" />
 		<pathelement location="./lib/junit-4.12.jar"/>
 		<pathelement location="./lib/javax.ws.rs-api-2.0.1.jar"/>
 		<pathelement location="./lib/javax.json-api-1.0.jar"/>
