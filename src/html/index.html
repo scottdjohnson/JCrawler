@@ -23,24 +23,25 @@ function getXmlHttp()
 
         xmlhttp.onreadystatechange = function()
         {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                if (xmlhttp.readyState > 2)
                 {
                         var responseText = xmlhttp.responseText;
                         var jsonParsed = JSON.parse(responseText);
                         var urlOutput = "";
 
+
 			if (null != jsonParsed.parent)
-                                urlOutput += "<p><a href='' onclick=\"return getAJAX(" + jsonParsed.parent + ");\">&lt;&lt; back</a></p>";
-                        for (var i = 0; i < jsonParsed.URLs.length; i++)
-                        {
-                                urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
-                                urlOutput += jsonParsed.URLs[i].URL + "</a> (" + jsonParsed.URLs[i].count + ")<br />";
-                        }
+                               	urlOutput += "<p><a href='' onclick=\"return getAJAX(" + jsonParsed.parent + ");\">&lt;&lt; back</a></p>";
+                       	for (var i = 0; i < jsonParsed.URLs.length; i++)
+                       	{
+                       	        urlOutput += "<a href='' onclick=\"return getAJAX(" + jsonParsed.URLs[i].key + ");\">";
+                       	        urlOutput += jsonParsed.URLs[i].URL + "</a> (" + jsonParsed.URLs[i].count + ")<br />";
+                       	}
 			if (null != jsonParsed.parent)
 				urlOutput += "<p><a href='' onclick=\"return getAJAX(" + jsonParsed.parent + ");\">&lt;&lt; back</a></p>";
 
-                        document.getElementById("urls").innerHTML = urlOutput;
-                }
+	                 document.getElementById("urls").innerHTML = urlOutput;
+		}
         };
 
 	return xmlhttp;
@@ -51,7 +52,7 @@ function deleteAll()
         var xmlhttp = constructXmlHttp();
 
 	document.getElementById("urls").innerHTML = "";
-        xmlhttp.open("DELETE","./JCrawlerServlet", false);
+        xmlhttp.open("DELETE","./jaxrs/urls", false);
         xmlhttp.send();
 }
 
@@ -59,7 +60,7 @@ function postAJAX()
 {
 	var xmlhttp = getXmlHttp();
 
-	xmlhttp.open("POST","./JCrawlerServlet", true);
+	xmlhttp.open("POST","./jaxrs/urls", true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xmlhttp.send("crawl_url=" + document.getElementById('urlkey').value);
 
@@ -72,7 +73,7 @@ function getAJAX( getKey)
 {
         var xmlhttp = getXmlHttp();
 
-        xmlhttp.open("GET","./JCrawlerServlet?urlkey=" + getKey,true);
+        xmlhttp.open("GET","./jaxrs/urls/" + getKey,true);
         xmlhttp.send();
 
 	return false;
@@ -102,7 +103,7 @@ This tool is a simple Java-based web crawler. Enter a complete url (beginning wi
 <p>
 Front page: HTML with JavaScript and AJAX
 <br />
-Back end: Java Servlet via Tomcat 7, MySQL 5.5.34, Linux (Ubuntu 13.04) on AWS/EC2
+Back end: Java Servlet via Tomcat 8, MySQL 5.7, Linux (Ubuntu 16.04.2) on AWS/EC2
 <p />
 <a href="https://github.com/scottdjohnson/JCrawler">Source code on gituhb</a>
 <p />
