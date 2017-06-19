@@ -23,7 +23,7 @@ function getXmlHttp()
 
         xmlhttp.onreadystatechange = function()
         {
-                if (xmlhttp.readyState > 2)
+                if (this.readyState == 4 && this.status == 200)
                 {
                         var responseText = xmlhttp.responseText;
                         var jsonParsed = JSON.parse(responseText);
@@ -103,7 +103,7 @@ This tool is a simple Java-based web crawler. Enter a complete url (beginning wi
 <p>
 Front page: HTML with JavaScript and AJAX
 <br />
-Back end: Java Servlet via Tomcat 8, MySQL 5.7, Linux (Ubuntu 16.04.2) on AWS/EC2
+Back end: JAX-RS (Jersey), Tomcat 8, MySQL 5.7, Linux (Ubuntu 16.04.2) on AWS/EC2
 <p />
 <a href="https://github.com/scottdjohnson/JCrawler">Source code on gituhb</a>
 <p />
