@@ -8,34 +8,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UrlNodeDao
+public class UrlNodeDao extends Dao
 {
-	Session session;
-	Transaction tx;
-	
 	private static final Logger logger = Logger.getLogger(UrlNodeDao.class.getPackage().getName());
 
-	public UrlNodeDao (Session s, Transaction t)
-	{
-		session = s;
-		tx = t;
-	}
-
-	/**
-	* Save this object in the database using a Hibernate session
-	* @param o The object to save
-	* 
-	**/
-	public void save(Object o)
-	{
-		try {
-			session.saveOrUpdate(o);
-			tx.commit();
-		}
-		catch (Exception e)
-		{
-			logger.log(Level.INFO, e.getMessage());
-		}
+	public UrlNodeDao (Session s, Transaction t) {
+		super(s,t);
 	}
 
 	/**
@@ -80,15 +58,5 @@ public class UrlNodeDao
 		}
 
 		return list;
-	}
-
-	/**
-	* Close the Hibernate session in this SessionBundle
-	*
-	**/
-	public void close()
-	{
-		session.flush();
-		session.close();
 	}
 }
