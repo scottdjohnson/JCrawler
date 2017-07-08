@@ -20,8 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.IOException;
 
-import scottdjohnson.node.URLNode;
-import scottdjohnson.jcrawler.JCrawler;
+import org.scottdjohnson.node.URLNode;
+import org.scottdjohnson.jcrawler.JCrawler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
