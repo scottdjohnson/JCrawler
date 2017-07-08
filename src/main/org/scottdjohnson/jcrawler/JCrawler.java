@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 import org.scottdjohnson.node.URLNode;
 import org.scottdjohnson.database.UrlNodeDao;
-import org.scottdjohnson.database.UrlNodeDaoFactory;
+import org.scottdjohnson.database.DaoFactory;
 
 /**
  * JCrawler provides the basic functionlity for crawling a Web URL.
@@ -43,7 +43,7 @@ import org.scottdjohnson.database.UrlNodeDaoFactory;
 public class JCrawler 
 {
 
-	private static UrlNodeDao sb = UrlNodeDaoFactory.getDao();
+	private static UrlNodeDao sb = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
 
 	private static final Logger logger = Logger.getLogger(JCrawler.class.getPackage().getName());	
 	/**

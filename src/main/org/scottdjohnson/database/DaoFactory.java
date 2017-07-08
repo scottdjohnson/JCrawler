@@ -9,22 +9,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A factory class for producing SessionBundles for managing Hibernate connections
+ * A factory class for producing Data Access Objects for managing Hibernate connections
  *
  * @author Scott Johnson
  **/
 
-public class UrlNodeDaoFactory
+public class DaoFactory
 {
+	public enum DaoType {URLNODE};
 
 	private static SessionFactory sessionFactory 	= new Configuration().configure().buildSessionFactory();
-	private static final Logger logger = Logger.getLogger(UrlNodeDaoFactory.class.getPackage().getName());
+	private static final Logger logger = Logger.getLogger(DaoFactory.class.getPackage().getName());
 
 	/**
 	* Private constructor so the class cannot be constructed
 	*
 	**/
-	private UrlNodeDaoFactory()
+	private DaoFactory()
 	{
 	}
 
@@ -32,7 +33,7 @@ public class UrlNodeDaoFactory
 	* Create and return a new session
 	*
 	**/
-	public static UrlNodeDao getDao()
+	public static Dao getDao(DaoType daoType)
 	{
 		Session s 	= null;
 		Transaction t 	= null;	
@@ -52,6 +53,13 @@ public class UrlNodeDaoFactory
 
 		if (null == s || null == t)
 			logger.log(Level.INFO, "s or t are null.");
-		return new UrlNodeDao(s,t);
+
+		switch (daoType)
+		{
+			case URLNODE:
+				return new UrlNodeDao(s,t);
+		}
+
+		return null;
 	}
 }
