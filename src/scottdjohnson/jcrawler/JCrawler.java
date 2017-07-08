@@ -32,8 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import scottdjohnson.node.URLNode;
-import scottdjohnson.database.SessionBundle;
-import scottdjohnson.database.SessionBundleFactory;
+import scottdjohnson.database.UrlNodeDao;
+import scottdjohnson.database.UrlNodeDaoFactory;
 
 /**
  * JCrawler provides the basic functionlity for crawling a Web URL.
@@ -42,6 +42,9 @@ import scottdjohnson.database.SessionBundleFactory;
  **/
 public class JCrawler 
 {
+
+	private static UrlNodeDao sb = UrlNodeDaoFactory.getDao();
+
 	private static final Logger logger = Logger.getLogger(JCrawler.class.getPackage().getName());	
 	/**
 	 * Crawl a URL and store it and its children in a database
@@ -53,7 +56,7 @@ public class JCrawler
 	 * @param uq The queue for holding the scanned URLs, to assure that they are scanned in order and only once per URL
 	 * @param sb The session bundle for saving URLs to the database
 	 */
-        public static void crawlLinksFromUrl( UniqueMemQueue<URLNode,String> uq, SessionBundle sb)
+        public static void crawlLinksFromUrl( UniqueMemQueue<URLNode,String> uq)
 	{		
 		// While the queue is not empty, grab the head of the queue, check its children and add them to the end
 		// of the queue for later processing in the loop
@@ -109,49 +112,15 @@ public class JCrawler
 	**/
 	public static void deleteAllUrls()
 	{
-		SessionBundle sb = SessionBundleFactory.getNewSession();
 		sb.deleteFromQuery("from URLNode url_list");
-		sb.close();
 	}
 
-	/**
-	* Delete URL from key, and its children
-	*
-	* @param urlKey The key of the URL to delete
-	**/
-/*
-	public static void deleteUrlAndChildren(Integer urlKey)
-	{
-		DBConnector.open();
-		deleteUrlAndChildrenRecurse(urlKey);
-                DBConnector.close();
-	}
-*/
-        /**
-        * Recursing function to delete a URL and its children
-        *
-        * @param urlKey The key of the URL to delete
-        **/
-/*
-	public static void deleteUrlAndChildrenRecurse(Integer urlKey)
-	{
-                // Get list of children with this as parent
-                List<URLNode> list = getChildren(urlKey);
-
-                // Recurse on children
-                if (null != list)
-                        for (int i = 0; i < list.size(); i++)
-                                deleteUrlAndChildrenRecurse( (int)(list.get(i)).getKey() );
-
-                DBConnector.deleteFromQuery("from URLNode url_list where url_key=" + urlKey);
-	}
-*/
 	/**
 	* Get all objects with this as the parent. Expects DBConnector to already be open
 	* 
 	* @param urlKey The key whose children this function returns
 	**/
-	public static List getChildren(Integer urlKey, SessionBundle sb)
+	public static List getChildren(Integer urlKey)
 	{
 		List list = null;
 
@@ -179,11 +148,7 @@ public class JCrawler
 	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
-		SessionBundle sb = SessionBundleFactory.getNewSession();
-
-		logger.log(Level.INFO, "SessionBundle created.");
-
-		List<URLNode> list = getChildren(urlKey, sb);
+		List<URLNode> list = getChildren(urlKey);
 		Iterator<URLNode> iterator = list.iterator();
 
 		JsonObjectBuilder jsonBuilder 		= Json.createObjectBuilder();
@@ -226,7 +191,6 @@ public class JCrawler
 
 		// Don't close or we might close System.out!
 		out.flush();
-		sb.close();
 	}
 
 	/**
@@ -243,9 +207,6 @@ public class JCrawler
 
 		try
 		{
-			logger.log(Level.INFO, "Opening database connection...");
-			SessionBundle sb = SessionBundleFactory.getNewSession();
-
 			logger.log(Level.INFO,"Putting URL into Map...");
 			uq.add(un, un.getUrl());
 
@@ -253,8 +214,7 @@ public class JCrawler
 			sb.save(un);
 
 			key = un.getKey();
-			JCrawler.crawlLinksFromUrl(uq, sb);
-			sb.close();
+			JCrawler.crawlLinksFromUrl(uq);
 		}
 		catch (Exception e)
 		{
