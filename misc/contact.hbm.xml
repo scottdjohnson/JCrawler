@@ -3,7 +3,7 @@
     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-  <class name="scottdjohnson.node.URLNode" table="url_list">
+  <class name="org.scottdjohnson.node.URLNode" table="url_list">
 		<id name="Key" type="long" column="url_key" >
 			<generator class="increment"/>
 		</id>
