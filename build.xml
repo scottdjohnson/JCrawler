@@ -6,7 +6,7 @@
         <property name="jar.file" value="JCrawler.jar"/>
 
 	<property name="lib.dir" value="lib"/>
-	<property name="source.dir" value="src"/>
+	<property name="source.dir" value="src/main"/>
         <property name="html.dir" value="src/html"/>
 
         <property name="dist.dir" value="dist"/>
@@ -69,7 +69,7 @@
 	<target depends="build" name="build-jar">
         <jar destfile="${dist.dir}/${jar.file}" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="scottdjohnson.jcrawler.JCrawlerApp"/>
+                <attribute name="Main-Class" value="org.scottdjohnson.jcrawler.JCrawlerApp"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
 			<fileset dir="${classes.dir}"/>
@@ -95,7 +95,7 @@
 	
 	<target name="javadoc" depends="clean-javadoc">
 		<mkdir dir="javadoc" />
-		<javadoc destdir="${dist.dir}/javadoc" sourcepath="${source.dir}" packagenames="scottdjohnson.*"/>
+		<javadoc destdir="${dist.dir}/javadoc" sourcepath="${source.dir}" packagenames="org.scottdjohnson.*"/>
 	</target>
 
 	<target name="clean-javadoc">
