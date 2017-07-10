@@ -110,7 +110,7 @@ public class JCrawler
 	public static void deleteAllUrls()
 	{
 		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
-		urlNodeDao.deleteFromQuery("from URLNode url_list");
+		urlNodeDao.deleteAllUrls();
 		urlNodeDao.close();
 	}
 
@@ -122,15 +122,16 @@ public class JCrawler
 	public static List getChildren(Integer urlKey)
 	{
 		List list = null;
+
 		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
 
 		try
 		{
                 	// If there is a specifc key, get it, otherwise get all of them
                 	if (null != urlKey)
-                	        list = urlNodeDao.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
+                	        list = urlNodeDao.getUrlsByParent(urlKey);
                 	else
-                	        list = urlNodeDao.getFromQuery("from URLNode url_list where parent_key = 0");
+                	        list = urlNodeDao.getUrlsByParent(0);
 		}
 		catch (Exception e)
 		{
@@ -152,9 +153,12 @@ public class JCrawler
 	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
+		List<URLNode> list = getChildren(urlKey);
+
+		// Until we implement getCurrentSession (instead of openSession in the Dao) then we need to open
+		// this session AFTER getChildren is complete (opened and closed)
 		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
 
-		List<URLNode> list = getChildren(urlKey);
 		Iterator<URLNode> iterator = list.iterator();
 
 		JsonObjectBuilder jsonBuilder 		= Json.createObjectBuilder();
@@ -167,8 +171,7 @@ public class JCrawler
 			int currentKey = (int)urlNode.getKey();
 
 			// Count the total number of results that have this URL as a parent
-			int count =(int) ((urlNodeDao.getFromQuery("select count(*) from URLNode where parent_key="
-				+ currentKey )).get(0));
+			int count = urlNodeDao.getNumUrlsWithParent(currentKey);
 			logger.log(Level.INFO, "Count query retrieved.");
 
 			JsonObjectBuilder jsonArrayItem = Json.createObjectBuilder();
@@ -184,13 +187,11 @@ public class JCrawler
 		jsonBuilder.add("URLs", jsonArrayBuilder.build());
 
 		// This will fail if the database is reorganized to support multiple parents
-		List<URLNode> l = (urlNodeDao.getFromQuery("from URLNode url_list where url_key=" + urlKey));
+		URLNode urlNode = urlNodeDao.getUrlByKey(urlKey);
 
-		urlNodeDao.close();
-
-		if (null != l && l.size() == 1)
+		if (null != urlNode)
 		{
-			int parentKey = (int)l.get(0).getParentKey();
+			long parentKey = urlNode.getParentKey();
 			jsonBuilder.add("parent", parentKey);
 		}
 
@@ -200,6 +201,7 @@ public class JCrawler
 
 		// Don't close or we might close System.out!
 		out.flush();
+		urlNodeDao.close();
 	}
 
 	/**
