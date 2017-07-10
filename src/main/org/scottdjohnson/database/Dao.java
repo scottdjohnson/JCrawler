@@ -13,7 +13,7 @@ public class Dao
 	protected Session session;
 	protected Transaction tx;
 	
-	private static final Logger logger = Logger.getLogger(UrlNodeDao.class.getPackage().getName());
+	private static final Logger logger = Logger.getLogger(Dao.class.getPackage().getName());
 
 	public Dao (Session s, Transaction t)
 	{

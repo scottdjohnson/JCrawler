@@ -42,9 +42,6 @@ import org.scottdjohnson.database.DaoFactory;
  **/
 public class JCrawler 
 {
-
-	private static UrlNodeDao sb = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
-
 	private static final Logger logger = Logger.getLogger(JCrawler.class.getPackage().getName());	
 	/**
 	 * Crawl a URL and store it and its children in a database
@@ -56,7 +53,7 @@ public class JCrawler
 	 * @param uq The queue for holding the scanned URLs, to assure that they are scanned in order and only once per URL
 	 * @param sb The session bundle for saving URLs to the database
 	 */
-        public static void crawlLinksFromUrl( UniqueMemQueue<URLNode,String> uq)
+        public static void crawlLinksFromUrl( UniqueMemQueue<URLNode,String> uq, UrlNodeDao urlNodeDao)
 	{		
 		// While the queue is not empty, grab the head of the queue, check its children and add them to the end
 		// of the queue for later processing in the loop
@@ -85,7 +82,7 @@ public class JCrawler
 						URLNode un = new URLNode(strLink, strLinkName, new Timestamp(new Date().getTime()), unParent.getKey());
 
 						logger.log(Level.INFO, "Adding URL: " + un.getUrl());
-						sb.save(un);
+						urlNodeDao.save(un);
 
 						// Add this URL to the queue, process later in the loop
 						uq.add(un, un.getUrl());
@@ -112,7 +109,9 @@ public class JCrawler
 	**/
 	public static void deleteAllUrls()
 	{
-		sb.deleteFromQuery("from URLNode url_list");
+		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
+		urlNodeDao.deleteFromQuery("from URLNode url_list");
+		urlNodeDao.close();
 	}
 
 	/**
@@ -123,18 +122,23 @@ public class JCrawler
 	public static List getChildren(Integer urlKey)
 	{
 		List list = null;
+		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
 
 		try
 		{
                 	// If there is a specifc key, get it, otherwise get all of them
                 	if (null != urlKey)
-                	        list = sb.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
+                	        list = urlNodeDao.getFromQuery("from URLNode url_list where parent_key = " + urlKey);
                 	else
-                	        list = sb.getFromQuery("from URLNode url_list where parent_key = 0");
+                	        list = urlNodeDao.getFromQuery("from URLNode url_list where parent_key = 0");
 		}
 		catch (Exception e)
 		{
 			logger.log(Level.WARNING, e.getMessage());
+		}
+		finally
+		{
+			urlNodeDao.close();
 		}
 
 		return list;
@@ -148,6 +152,8 @@ public class JCrawler
 	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
+		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
+
 		List<URLNode> list = getChildren(urlKey);
 		Iterator<URLNode> iterator = list.iterator();
 
@@ -161,7 +167,7 @@ public class JCrawler
 			int currentKey = (int)urlNode.getKey();
 
 			// Count the total number of results that have this URL as a parent
-			int count =(int) ((sb.getFromQuery("select count(*) from URLNode where parent_key="
+			int count =(int) ((urlNodeDao.getFromQuery("select count(*) from URLNode where parent_key="
 				+ currentKey )).get(0));
 			logger.log(Level.INFO, "Count query retrieved.");
 
@@ -178,7 +184,10 @@ public class JCrawler
 		jsonBuilder.add("URLs", jsonArrayBuilder.build());
 
 		// This will fail if the database is reorganized to support multiple parents
-		List<URLNode> l = (sb.getFromQuery("from URLNode url_list where url_key=" + urlKey));
+		List<URLNode> l = (urlNodeDao.getFromQuery("from URLNode url_list where url_key=" + urlKey));
+
+		urlNodeDao.close();
+
 		if (null != l && l.size() == 1)
 		{
 			int parentKey = (int)l.get(0).getParentKey();
@@ -205,20 +214,26 @@ public class JCrawler
 		long key                        = 0; // Fail safe: return the top level item
 		URLNode un 			= new URLNode(url, url, new Timestamp(new Date().getTime()), key);
 
+		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
+
 		try
 		{
 			logger.log(Level.INFO,"Putting URL into Map...");
 			uq.add(un, un.getUrl());
 
 			logger.log(Level.INFO, "Saving URL: " + url);
-			sb.save(un);
+			urlNodeDao.save(un);
 
 			key = un.getKey();
-			JCrawler.crawlLinksFromUrl(uq);
+			crawlLinksFromUrl(uq, urlNodeDao);
 		}
 		catch (Exception e)
 		{
 			logger.log(Level.INFO, e.getMessage());
+		}
+		finally
+		{
+			urlNodeDao.close();
 		}
 
 		return key;
