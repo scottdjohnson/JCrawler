@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.io.OutputStream;
 
 import org.scottdjohnson.node.URLNode;
-import org.scottdjohnson.jcrawler.JCrawler;
+import org.scottdjohnson.jcrawler.model.JCrawler;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Query;

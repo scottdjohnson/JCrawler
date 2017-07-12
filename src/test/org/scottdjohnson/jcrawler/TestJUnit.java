@@ -15,6 +15,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
+import org.scottdjohnson.jcrawler.model.JCrawler;
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestJUnit {
 
