@@ -7,6 +7,7 @@
 
 	<property name="lib.dir" value="lib"/>
 	<property name="source.dir" value="src/main"/>
+	<property name="test.dir" value="src/test"/>
         <property name="html.dir" value="src/html"/>
 
         <property name="dist.dir" value="dist"/>
@@ -42,7 +43,23 @@
 			<classpath refid="JCrawlerDependencies.classpath"/>
 		</javac>
 	
-    </target>
+	</target>
+
+        <target name="build-test" depends="build">
+                <mkdir dir="${classes.dir}"/>
+                <copy includeemptydirs="false" todir="${classes.dir}">
+                        <fileset dir="misc">
+                                <exclude name="**/*.launch"/>
+                                <exclude name="**/*.java"/>
+                        </fileset>
+                </copy>
+
+                <javac srcdir="${test.dir}" destdir="${classes.dir}" includeantruntime="false">
+                        <classpath refid="JCrawlerDependencies.classpath"/>
+                </javac>
+
+        </target>
+
 	
 	<target name="build-war" depends="build,javadoc">
 		<war destfile="${dist.dir}/${war.file}" webxml="${source.dir}/web.xml">
