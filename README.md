@@ -60,6 +60,5 @@ To run this as a servlet:
 JUnit
 ========
 
-	Download the latest from junit.org
-	export JUNIT_HOME=/path/to/junit.jar
-
+	ant build-test
+	java -cp lib/*:build/classes org.scottdjohnson.jcrawler.TestRunner
