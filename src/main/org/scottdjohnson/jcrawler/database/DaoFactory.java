@@ -1,4 +1,4 @@
-package org.scottdjohnson.database;
+package org.scottdjohnson.jcrawler.database;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;

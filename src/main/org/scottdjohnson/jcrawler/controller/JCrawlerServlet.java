@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.IOException;
 
-import org.scottdjohnson.node.URLNode;
+import org.scottdjohnson.jcrawler.node.URLNode;
 import org.scottdjohnson.jcrawler.model.JCrawler;
 
 import java.util.logging.Level;

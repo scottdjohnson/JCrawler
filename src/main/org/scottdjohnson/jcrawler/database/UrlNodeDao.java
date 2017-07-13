@@ -1,4 +1,4 @@
-package org.scottdjohnson.database;
+package org.scottdjohnson.jcrawler.database;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.scottdjohnson.node.URLNode;
+import org.scottdjohnson.jcrawler.node.URLNode;
 
 public class UrlNodeDao extends Dao
 {

@@ -1,4 +1,4 @@
-package org.scottdjohnson.node;
+package org.scottdjohnson.jcrawler.node;
 
 import java.util.Date;
 import java.sql.Timestamp;
