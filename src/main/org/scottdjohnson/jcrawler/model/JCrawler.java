@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.scottdjohnson.jcrawler.node.URLNode;
+import org.scottdjohnson.jcrawler.node.UrlNode;
 import org.scottdjohnson.jcrawler.database.UrlNodeDao;
 import org.scottdjohnson.jcrawler.database.DaoFactory;
 
@@ -53,7 +53,7 @@ public class JCrawler
 	 * @param uq The queue for holding the scanned URLs, to assure that they are scanned in order and only once per URL
 	 * @param sb The session bundle for saving URLs to the database
 	 */
-        public static void crawlLinksFromUrl( UniqueMemQueue<URLNode,String> uq, UrlNodeDao urlNodeDao)
+        public static void crawlLinksFromUrl( UniqueMemQueue<UrlNode,String> uq, UrlNodeDao urlNodeDao)
 	{		
 		// While the queue is not empty, grab the head of the queue, check its children and add them to the end
 		// of the queue for later processing in the loop
@@ -63,7 +63,7 @@ public class JCrawler
 
 			try {
 				// Get the URL at the head of the queue
-				URLNode unParent 	= uq.remove();
+				UrlNode unParent 	= uq.remove();
 				Document doc    	= Jsoup.connect(unParent.getUrl()).get();
 				Elements links  	= doc.select("a[href]");
 				doc = null;
@@ -79,7 +79,7 @@ public class JCrawler
 					// We currently ignore absolute URLs assuming they are external
 					if(!uq.containsValue(strLink) && !u.isAbsolute())
 					{
-						URLNode un = new URLNode(strLink, strLinkName, new Timestamp(new Date().getTime()), unParent.getKey());
+						UrlNode un = new UrlNode(strLink, strLinkName, new Timestamp(new Date().getTime()), unParent.getKey());
 
 						logger.log(Level.INFO, "Adding URL: " + un.getUrl());
 						urlNodeDao.save(un);
@@ -153,13 +153,13 @@ public class JCrawler
 	**/
 	public static void getUrls(Integer urlKey, PrintWriter out)
 	{
-		List<URLNode> list = getChildren(urlKey);
+		List<UrlNode> list = getChildren(urlKey);
 
 		// Until we implement getCurrentSession (instead of openSession in the Dao) then we need to open
 		// this session AFTER getChildren is complete (opened and closed)
 		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
 
-		Iterator<URLNode> iterator = list.iterator();
+		Iterator<UrlNode> iterator = list.iterator();
 
 		JsonObjectBuilder jsonBuilder 		= Json.createObjectBuilder();
 		JsonArrayBuilder jsonArrayBuilder 	= Json.createArrayBuilder();
@@ -167,7 +167,7 @@ public class JCrawler
 		// Loop through all the results from the query
 		while (iterator.hasNext())
 		{
-			URLNode urlNode = iterator.next();
+			UrlNode urlNode = iterator.next();
 			int currentKey = (int)urlNode.getKey();
 
 			// Count the total number of results that have this URL as a parent
@@ -187,7 +187,7 @@ public class JCrawler
 		jsonBuilder.add("URLs", jsonArrayBuilder.build());
 
 		// This will fail if the database is reorganized to support multiple parents
-		URLNode urlNode = urlNodeDao.getUrlByKey(urlKey);
+		UrlNode urlNode = urlNodeDao.getUrlByKey(urlKey);
 
 		if (null != urlNode)
 		{
@@ -211,10 +211,10 @@ public class JCrawler
 	**/
 	public static long addUrl(String url)
 	{
-		UniqueMemQueue<URLNode,String> uq 	= new UniqueMemQueue<URLNode,String>();
+		UniqueMemQueue<UrlNode,String> uq 	= new UniqueMemQueue<UrlNode,String>();
 
 		long key                        = 0; // Fail safe: return the top level item
-		URLNode un 			= new URLNode(url, url, new Timestamp(new Date().getTime()), key);
+		UrlNode un 			= new UrlNode(url, url, new Timestamp(new Date().getTime()), key);
 
 		UrlNodeDao urlNodeDao = (UrlNodeDao)DaoFactory.getDao(DaoFactory.DaoType.URLNODE);
 

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.scottdjohnson.jcrawler.node.URLNode;
+import org.scottdjohnson.jcrawler.node.UrlNode;
 
 public class UrlNodeDao extends Dao
 {
@@ -26,7 +26,7 @@ public class UrlNodeDao extends Dao
 	{
                 try
                 {
-                        Query query = session.createQuery("from URLNode url_list");
+                        Query query = session.createQuery("from UrlNode url_list");
                         List list = query.list();
 
                         for (int i = 0; i < list.size(); i++)
@@ -46,12 +46,12 @@ public class UrlNodeDao extends Dao
         * Get the List of Urls with the given parent
         * @param parentKey The key of the parent URL
         **/
-        public List<URLNode> getUrlsByParent(Integer parentKey)
+        public List<UrlNode> getUrlsByParent(Integer parentKey)
 	{
 		List list = null;
 		try
 		{
-			Query query = session.createQuery("from URLNode url_list where parent_key = :parentKey");
+			Query query = session.createQuery("from UrlNode url_list where parent_key = :parentKey");
 			query.setParameter("parentKey", parentKey);
 			list = query.list();
 		}
@@ -72,7 +72,7 @@ public class UrlNodeDao extends Dao
                 List list = null;
                 try
                 {
-                        Query query = session.createQuery("select count(*) from URLNode url_list where parent_key = :parentKey");
+                        Query query = session.createQuery("select count(*) from UrlNode url_list where parent_key = :parentKey");
                         query.setParameter("parentKey", parentKey);
                         list = query.list();
                 }
@@ -88,14 +88,14 @@ public class UrlNodeDao extends Dao
         * Get the List of Urls which have this key
         * @param urlKey The key of the URL
         **/
-        public URLNode getUrlByKey(Integer urlKey)
+        public UrlNode getUrlByKey(Integer urlKey)
         {
 		logger.log(Level.INFO, "Get Url with key: " + urlKey);
 
-                List<URLNode> list = null;
+                List<UrlNode> list = null;
                 try
                 {
-                        Query query = session.createQuery("from URLNode url_list where url_key = :urlKey");
+                        Query query = session.createQuery("from UrlNode url_list where url_key = :urlKey");
                         query.setParameter("urlKey", urlKey);
                         list = query.list();
                 }

@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  *
  * @author Scott Johnson
  **/
-public class URLNode extends Node
+public class UrlNode extends Node
 {
 	String url;
 	String name;
@@ -24,7 +24,7 @@ public class URLNode extends Node
 	/**
 	 * Default constructor
 	 **/
-	public URLNode ()
+	public UrlNode ()
 	{
 		super();
 		setUrl("");
@@ -38,7 +38,7 @@ public class URLNode extends Node
 	 *
 	 * @param s A String which is the new URL
 	 **/
-	public URLNode( String s )
+	public UrlNode( String s )
 	{
 		super();
 		
@@ -52,7 +52,7 @@ public class URLNode extends Node
 	 * @param s the URL
 	 * @param parentKey the parent key (from the database) of this URL
 	 **/
-	public URLNode( String s, long parentKey )
+	public UrlNode( String s, long parentKey )
 	{
 		this(s);
 		this.parentKey = parentKey;
@@ -66,7 +66,7 @@ public class URLNode extends Node
 	 * @param t the date and time this URL was crawled
 	 * @param parentKey the parent key (from the database) of this URL
 	 **/
-	public URLNode( String s, String n, Timestamp t, long parentKey )
+	public UrlNode( String s, String n, Timestamp t, long parentKey )
 	{
 		this(s);
 		this.name = n;
@@ -81,7 +81,7 @@ public class URLNode extends Node
 	 **/
 	public Node copy()
 	{
-		return new URLNode( url );
+		return new UrlNode( url );
 	}
 		
 	/**
@@ -92,7 +92,7 @@ public class URLNode extends Node
 	 **/
 	public boolean isGreater(Node test)
 	{
-		if (this.url.compareTo( ((URLNode)test).getUrl()) > 0 )
+		if (this.url.compareTo( ((UrlNode)test).getUrl()) > 0 )
 			return true;
 		else
 			return false;
@@ -113,7 +113,7 @@ public class URLNode extends Node
 			return false;
 
 		logger.log(Level.INFO, "Compare: " + this.url + " " + ((URLNode)o).getUrl());
-		return this.url.compareTo( ((URLNode)o).getUrl() ) == 0;
+		return this.url.compareTo( ((UrlNode)o).getUrl() ) == 0;
 	}
 
         /**
@@ -128,7 +128,7 @@ public class URLNode extends Node
 	}
 
 	/**
-	 * Get the URL of this URLNode
+	 * Get the URL of this UrlNode
 	 *
 	 * @return the URL
 	 **/
@@ -138,7 +138,7 @@ public class URLNode extends Node
 	}
 	
 	/**
-	 * Set the URL of this URLNode
+	 * Set the URL of this UrlNode
 	 * Private because it should only be used internally at this point
 	 *
 	 * @params s The URL to set this to
@@ -162,7 +162,7 @@ public class URLNode extends Node
 	}
 	
 	/**
-	 * Set the link name of this URLNode
+	 * Set the link name of this UrlNode
 	 * Private because it should only be used internally at this point
 	 *
 	 * @params s The link name to set this to
