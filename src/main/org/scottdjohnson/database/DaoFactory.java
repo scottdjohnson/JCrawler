@@ -18,7 +18,6 @@ public class DaoFactory
 {
 	public enum DaoType {URLNODE};
 
-	private static SessionFactory sessionFactory 	= new Configuration().configure().buildSessionFactory();
 	private static final Logger logger = Logger.getLogger(DaoFactory.class.getPackage().getName());
 
 	/**
@@ -35,16 +34,14 @@ public class DaoFactory
 	**/
 	public static Dao getDao(DaoType daoType)
 	{
+		SessionFactory sessionFactory 	= new Configuration().configure().buildSessionFactory();
 		Session s 	= null;
 		Transaction t 	= null;	
 
 		try
 		{
-			synchronized (sessionFactory)
-			{
-				s = sessionFactory.openSession();
-				t = s.beginTransaction();
-			}
+			s = sessionFactory.openSession();
+			t = s.beginTransaction();
 		}
 		catch (Exception e)
 		{
