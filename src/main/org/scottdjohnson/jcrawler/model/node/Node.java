@@ -1,4 +1,4 @@
-package org.scottdjohnson.jcrawler.node;
+package org.scottdjohnson.jcrawler.model.node;
 
 /**
  * A node in a binary tree

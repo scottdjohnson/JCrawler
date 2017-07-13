@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStream;
 
-import org.scottdjohnson.jcrawler.node.URLNode;
+import org.scottdjohnson.jcrawler.model.node.UrlNode;
 import org.scottdjohnson.jcrawler.model.JCrawler;
 
 import org.hibernate.cfg.Configuration;

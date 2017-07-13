@@ -1,4 +1,4 @@
-package org.scottdjohnson.jcrawler.node;
+package org.scottdjohnson.jcrawler.model.node;
 
 import java.util.Date;
 import java.sql.Timestamp;
@@ -19,7 +19,7 @@ public class UrlNode extends Node
 	private long key;
 	private long parentKey;
 
-	private static final Logger logger = Logger.getLogger(URLNode.class.getPackage().getName());
+	private static final Logger logger = Logger.getLogger(UrlNode.class.getPackage().getName());
 
 	/**
 	 * Default constructor
@@ -109,10 +109,10 @@ public class UrlNode extends Node
 	{
 		if (o == null)
 			return false;
-		if (!(o instanceof URLNode))
+		if (!(o instanceof UrlNode))
 			return false;
 
-		logger.log(Level.INFO, "Compare: " + this.url + " " + ((URLNode)o).getUrl());
+		logger.log(Level.INFO, "Compare: " + this.url + " " + ((UrlNode)o).getUrl());
 		return this.url.compareTo( ((UrlNode)o).getUrl() ) == 0;
 	}
 
@@ -152,7 +152,7 @@ public class UrlNode extends Node
 	}
 
 	/**
-	 * Get the link name of this URLNode
+	 * Get the link name of this UrlNode
 	 *
 	 * @return the link name
 	 **/

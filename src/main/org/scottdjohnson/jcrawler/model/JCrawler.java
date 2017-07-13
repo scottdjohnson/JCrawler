@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.scottdjohnson.jcrawler.node.UrlNode;
+import org.scottdjohnson.jcrawler.model.node.UrlNode;
 import org.scottdjohnson.jcrawler.database.UrlNodeDao;
 import org.scottdjohnson.jcrawler.database.DaoFactory;
 
