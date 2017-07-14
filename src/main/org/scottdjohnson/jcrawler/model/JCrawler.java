@@ -66,7 +66,6 @@ public class JCrawler
 				UrlNode unParent 	= uq.remove();
 				Document doc    	= Jsoup.connect(unParent.getUrl()).get();
 				Elements links  	= doc.select("a[href]");
-				doc = null;
 
 				// Look at each URL within the HTML page produced by the current URL
 				for (Element link : links)
@@ -115,7 +114,7 @@ public class JCrawler
 	}
 
 	/**
-	* Get all objects with this as the parent. Expects DBConnector to already be open
+	* Get all objects with this as the parent. 
 	* 
 	* @param urlKey The key whose children this function returns
 	**/
